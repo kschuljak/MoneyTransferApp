@@ -11,8 +11,8 @@ import org.springframework.web.client.RestTemplate;
 public class AuthenticationService
 {
 
-    private final String baseUrl;
-    private final RestTemplate restTemplate = new RestTemplate();
+    protected final String baseUrl;
+    protected final RestTemplate restTemplate = new RestTemplate();
 
     public AuthenticationService(String url)
     {
@@ -58,4 +58,6 @@ public class AuthenticationService
         headers.setContentType(MediaType.APPLICATION_JSON);
         return new HttpEntity<>(credentials, headers);
     }
+
+
 }

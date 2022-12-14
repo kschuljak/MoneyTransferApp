@@ -111,34 +111,54 @@ public class TenmoApp
         }
     }
 
-    private void viewCurrentBalance()
+    private void viewCurrentBalance() // require user authentication
     {
         // TODO Auto-generated method stub
 
     }
 
-    private void viewTransferHistory()
+    private void viewTransferHistory() // require user authentication
+    {
+        // sent & received & requested
+        // TODO Auto-generated method stub
+
+    }
+
+    private void viewPendingRequests() // require user authentication
     {
         // TODO Auto-generated method stub
 
     }
 
-    private void viewPendingRequests()
+    private void sendBucks() // require user authentication
     {
+        // user can't send money to themselves
+        // user can't send more than their current balance
+        // user can't send 0 or negative money
+        // decrease sender (user) account & increase receiver account
+        // initial status = 'approved'
         // TODO Auto-generated method stub
 
     }
 
-    private void sendBucks()
+    private void requestBucks() // require user authentication
     {
+        // choose from a list of users to request from
+        // user can't request money from themselves
+        // user can't request 0 or negative money
+        // transfer includes user id of both & money amount
+        // initial status = 'pending'
+        // account balances unaltered until request is approved
+        // transfer request added to list of transfers for both parties
         // TODO Auto-generated method stub
 
     }
 
-    private void requestBucks()
-    {
-        // TODO Auto-generated method stub
+    // approve transfer method
+    // require user authentication
+    // changes status to 'approved' or 'rejected'
+    // if approved, decrease sender account & increase receiver account
+    // if rejected, no change to accounts
 
-    }
 
 }
