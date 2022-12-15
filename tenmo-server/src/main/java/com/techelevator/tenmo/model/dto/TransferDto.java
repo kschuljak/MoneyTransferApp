@@ -1,4 +1,4 @@
-package com.techelevator.tenmo.dto;
+package com.techelevator.tenmo.model.dto;
 
 import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;

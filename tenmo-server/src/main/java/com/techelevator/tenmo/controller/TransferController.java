@@ -1,8 +1,7 @@
 package com.techelevator.tenmo.controller;
 
-import com.techelevator.tenmo.dao.JdbcAccountDao;
 import com.techelevator.tenmo.dao.TransferDao;
-import com.techelevator.tenmo.dto.TransferDto;
+import com.techelevator.tenmo.model.dto.TransferDto;
 import com.techelevator.tenmo.model.Transfer;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,7 +22,7 @@ public class TransferController {
     }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
-    public List<Transfer> getTransfers(Principal principal) {
+    public List<Transfer> getAllTransfers(Principal principal) {
         String username = principal.getName();
         return transferDao.getAllTransfersByUsername(username);
     }

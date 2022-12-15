@@ -154,6 +154,9 @@ public class TenmoApp
 
     }
 
+    private void approveTransfer(){
+
+    }
     // approve transfer method
     // require user authentication
     // changes status to 'approved' or 'rejected'

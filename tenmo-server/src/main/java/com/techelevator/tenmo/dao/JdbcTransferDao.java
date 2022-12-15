@@ -39,6 +39,29 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
+    public List<Transfer> getAllPendingTransfersByUsername(String username){
+        List<Transfer> transfers = new ArrayList<>();
+        String sqlQuery = "SELECT transfer_id, transfer_type_desc, transfer_status_desc, account_from, account_to, amount FROM transfer\n" +
+                "JOIN transfer_type ON transfer.transfer_type_id = transfer_type.transfer_type_id\n" +
+                "JOIN transfer_status ON transfer.transfer_status_id = transfer_status.transfer_status_id\n" +
+                "JOIN account ON account_id = account_from\n" +
+                "JOIN tenmo_user ON account.user_id = tenmo_user.user_id\n" +
+                "WHERE tenmo_user.username = ? AND transfer_status.transfer_status_desc = 'Pending';\n" +
+                "UNION\n" +
+                "SELECT transfer_id, transfer_type_desc, transfer_status_desc, account_from, account_to, amount FROM transfer\n" +
+                "JOIN transfer_type ON transfer.transfer_type_id = transfer_type.transfer_type_id\n" +
+                "JOIN transfer_status ON transfer.transfer_status_id = transfer_status.transfer_status_id\n" +
+                "JOIN account ON account_id = account_to\n" +
+                "JOIN tenmo_user ON account.user_id = tenmo_user.user_id\n" +
+                "WHERE tenmo_user.username = ? AND transfer_status.transfer_status_desc = 'Pending';";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlQuery, username, username);
+        while (results.next()) {
+            transfers.add(mapRowToTransfer(results));
+        }
+        return transfers;
+    }
+
+    @Override
     public boolean createTransfer(Transfer transfer) {
         String sqlQuery = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount)\n" +
                 "VALUES ((SELECT transfer_type_id FROM transfer_type WHERE transfer_type_desc = ?),\n" +

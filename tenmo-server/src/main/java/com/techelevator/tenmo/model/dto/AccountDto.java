@@ -1,9 +1,11 @@
-package com.techelevator.tenmo.models;
+package com.techelevator.tenmo.model.dto;
 
+import javax.validation.constraints.NotEmpty;
 import java.math.BigDecimal;
 
-public class Account {
+public class AccountDto {
 
+    @NotEmpty
     private BigDecimal amount;
 
     public BigDecimal getAmount() {

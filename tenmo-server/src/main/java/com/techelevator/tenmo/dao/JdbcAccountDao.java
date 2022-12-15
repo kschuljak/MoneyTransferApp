@@ -14,19 +14,33 @@ public class JdbcAccountDao implements AccountDao {
     @Override
     public Account getAccountByUserId(int userId) {
         Account account = null;
-        String sqlQuery = "SELECT account_id, balance\n" +
+        String sqlQuery = "SELECT user_id, account_id, balance\n" +
                 "FROM account\n" +
                 "WHERE user_id = ?";
         SqlRowSet results = jdbcTemplate.queryForRowSet(sqlQuery, userId);
         while (results.next()) {
-            account = mapRowToAccount(results, userId);
+            account = mapRowToAccount(results);
+            account.setUserId(userId);
         }
         return account;
     }
 
-    private Account mapRowToAccount(SqlRowSet results, int userId) {
+    @Override
+    public Account getAccountByUsername(String username) {
+        Account account = null;
+        String sqlQuery = "SELECT account.user_id, account_id, balance FROM account " +
+            "JOIN tenmo_user ON tenmo_user.user_id = account.user_id " +
+            "WHERE username = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlQuery, username);
+        while (results.next()) {
+            account = mapRowToAccount(results);
+        }
+        return account;
+    }
+
+    private Account mapRowToAccount(SqlRowSet results) {
         Account account = new Account();
-        account.setUserId(userId);
+        account.setUserId(results.getInt("user_id"));
         account.setAccountId(results.getInt("account_id"));
         account.setAmount(results.getBigDecimal("balance"));
         return account;

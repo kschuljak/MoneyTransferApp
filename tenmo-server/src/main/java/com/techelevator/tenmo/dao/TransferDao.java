@@ -6,8 +6,11 @@ import java.util.List;
 
 public interface TransferDao {
     List<Transfer> getAllTransfersByUsername(String username);
+
+    List<Transfer> getAllPendingTransfersByUsername(String username);
+
     boolean createTransfer(Transfer transfer);
     void updateTransferStatus(int transferId, String newTransferStatus);
     boolean sendTransfer(Transfer transfer);
-    public int getAccountIdByUsername(String username);
+    int getAccountIdByUsername(String username);
 }
