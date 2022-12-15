@@ -4,6 +4,7 @@ import com.techelevator.tenmo.model.Transfer;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +61,37 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    public boolean sendTransfer(int transferId) {
+    public boolean sendTransfer(Transfer transfer) {
+        // account_from (money out), account_to (money in)
+        // TODO (maybe?) add in validation for transaction completion
+        int transferId = transfer.getTransferId();
+        int accountFrom = transfer.getAccountFrom();
+        int accountTo = transfer.getAccountTo();
+        BigDecimal amount = transfer.getAmount();
+        if (!isValidTransfer(transfer)) {
+            return false;
+        }
+        String sqlQuery = "BEGIN TRANSACTION " +
+                "UPDATE account SET balance = (balance + ?) WHERE account_id = ?; " +
+                "UPDATE account SET balance = (balance - ?) WHERE account_id = ?; " +
+                "COMMIT;";
+        jdbcTemplate.update(sqlQuery, amount, accountTo, amount, accountFrom);
+        return true;
+    }
+
+    public boolean isValidTransfer(Transfer transfer){
+        // account_from (money out), account_to (money in)
+        // if requested transfer amount > account_from balance
+        int accountFrom = transfer.getAccountFrom();
+        BigDecimal amount = transfer.getAmount();
+        String sqlQuery = "SELECT balance FROM account WHERE account_id = ?";
+        BigDecimal balance = jdbcTemplate.queryForObject(sqlQuery, BigDecimal.class, accountFrom);
+
+        if (balance != null) {
+            if (balance.compareTo(amount) >= 0) {
+                return true;
+            }
+        }
         return false;
     }
 

@@ -8,5 +8,5 @@ public interface TransferDao {
     List<Transfer> getAllTransfersByUserId(int userId);
     boolean createTransfer(Transfer transfer);
     void updateTransferStatus(int transferId, String newTransferStatus);
-    boolean sendTransfer(int transferId);
+    boolean sendTransfer(Transfer transfer);
 }
