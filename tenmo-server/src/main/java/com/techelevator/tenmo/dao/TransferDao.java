@@ -1,4 +1,4 @@
 package com.techelevator.tenmo.dao;
 
-public interface AccountDto {
+public interface TransferDao {
 }
