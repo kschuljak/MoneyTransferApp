@@ -6,7 +6,15 @@ public class Account {
 
     private int accountId;
     private int userId;
-    private BigDecimal amount;
+    private BigDecimal amount = new BigDecimal("1000");
+
+    public Account(int accountId, int userId) {
+        this.accountId = accountId;
+        this.userId = userId;
+    }
+
+    public Account() {
+    }
 
     public int getAccountId() {
         return accountId;
