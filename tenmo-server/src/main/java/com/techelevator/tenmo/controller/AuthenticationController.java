@@ -20,24 +20,20 @@ import javax.validation.Valid;
  * Controller to authenticate users.
  */
 @RestController
-public class AuthenticationController
-{
-
+public class AuthenticationController {
     private final TokenProvider tokenProvider;
     private final AuthenticationManagerBuilder authenticationManagerBuilder;
     private final UserDao userDao;
 
-    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder authenticationManagerBuilder, UserDao userDao)
-    {
+    public AuthenticationController(TokenProvider tokenProvider, AuthenticationManagerBuilder
+            authenticationManagerBuilder, UserDao userDao) {
         this.tokenProvider = tokenProvider;
         this.authenticationManagerBuilder = authenticationManagerBuilder;
         this.userDao = userDao;
     }
 
     @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public LoginResponseDto login(@Valid @RequestBody LoginDto loginDto)
-    {
-
+    public LoginResponseDto login(@Valid @RequestBody LoginDto loginDto) {
         UsernamePasswordAuthenticationToken authenticationToken =
                 new UsernamePasswordAuthenticationToken(loginDto.getUsername(), loginDto.getPassword());
 
@@ -52,13 +48,10 @@ public class AuthenticationController
 
     @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(value = "/register", method = RequestMethod.POST)
-    public void register(@Valid @RequestBody RegisterUserDto newUser)
-    {
-        if (!userDao.create(newUser.getUsername(), newUser.getPassword()))
-        {
+    public void register(@Valid @RequestBody RegisterUserDto newUser) {
+        if (!userDao.create(newUser.getUsername(), newUser.getPassword())) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User registration failed.");
         }
     }
-
 }
 
