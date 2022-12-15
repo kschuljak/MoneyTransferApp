@@ -119,7 +119,6 @@ public class JdbcUserDao implements UserDao
         {
             return false;
         }
-
         return true;
     }
 
