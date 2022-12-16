@@ -5,7 +5,11 @@ import java.math.BigDecimal;
 
 public class TransferDto {
     @NotEmpty
+    private int transferId;
+    @NotEmpty
     private String transferType;
+    @NotEmpty
+    private String transferStatus;
     @NotEmpty
     private String userFrom;
     @NotEmpty
@@ -28,12 +32,29 @@ public class TransferDto {
 //        }
 //    }
 
+
+    public int getTransferId() {
+        return transferId;
+    }
+
+    public void setTransferId(int transferId) {
+        this.transferId = transferId;
+    }
+
     public String getTransferType() {
         return transferType;
     }
 
     public void setTransferType(String transferType) {
         this.transferType = transferType;
+    }
+
+    public String getTransferStatus() {
+        return transferStatus;
+    }
+
+    public void setTransferStatus(String transferStatus) {
+        this.transferStatus = transferStatus;
     }
 
     public String getUserFrom() {

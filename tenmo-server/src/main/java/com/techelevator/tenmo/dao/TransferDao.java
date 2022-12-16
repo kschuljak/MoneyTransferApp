@@ -10,7 +10,7 @@ public interface TransferDao {
     List<Transfer> getAllPendingTransfersByUsername(String username);
 
     boolean createTransfer(Transfer transfer);
-    void updateTransferStatus(int transferId, String newTransferStatus);
+    void updateTransferStatus(String username, int transferId, String newTransferStatus);
     boolean sendTransfer(Transfer transfer);
     int getAccountIdByUsername(String username);
 }

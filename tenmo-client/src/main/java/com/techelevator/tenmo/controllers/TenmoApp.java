@@ -5,6 +5,7 @@ import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.views.UserOutput;
+import com.techelevator.util.BasicLogger;
 
 public class TenmoApp
 {
@@ -54,9 +55,8 @@ public class TenmoApp
     {
         System.out.println("Please register a new user account");
         UserCredentials credentials = userOutput.promptForCredentials();
-        if (authenticationService.register(credentials))
-        {
-            System.out.println("Registration successful. You can now login.");
+        if (authenticationService.register(credentials)) {
+                System.out.println("Registration successful. You can now login.");
         }
         else
         {
@@ -100,6 +100,10 @@ public class TenmoApp
             else if (menuSelection == 5)
             {
                 accountService.requestBucks(currentUser);
+            }
+            else if (menuSelection == 6)
+            {
+                accountService.updateTransfer(currentUser);
             }
             else if (menuSelection == 0)
             {

@@ -4,6 +4,8 @@ import com.techelevator.tenmo.models.Account;
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
+import com.techelevator.tenmo.views.UserInput;
+import com.techelevator.tenmo.views.UserOutput;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +23,8 @@ public class AccountService {
 
     protected final String baseUrl;
     protected final RestTemplate restTemplate = new RestTemplate();
-    private Scanner input = new Scanner(System.in);
+    private UserInput in = new UserInput();
+    private UserOutput out = new UserOutput();
 
     public AccountService(String baseUrl) {
         this.baseUrl = baseUrl;
@@ -82,12 +85,7 @@ public class AccountService {
         }
 
         for (Transfer transfer : transfers) {
-            System.out.print("Transfer type: " + transfer.getTransferType() + " |");
-            System.out.print("Status: " + transfer.getStatus() + " |");
-            System.out.print("From user: " + transfer.getUserFrom() + " |");
-            System.out.print("To user: " + transfer.getUserTo() + " |");
-            System.out.print("Amount: " + transfer.getAmount());
-            System.out.println();
+            out.printTransfer(transfer);
         }
     }
 
@@ -105,12 +103,7 @@ public class AccountService {
         }
 
         for (Transfer transfer : transfers) {
-            System.out.print("Transfer type: " + transfer.getTransferType() + " |");
-            System.out.print("Status: " + transfer.getStatus() + " |");
-            System.out.print("From user: " + transfer.getUserFrom() + " |");
-            System.out.print("To user: " + transfer.getUserTo() + " |");
-            System.out.print("Amount: " + transfer.getAmount());
-            System.out.println();
+            out.printTransfer(transfer);
         }
     }
 
@@ -125,11 +118,9 @@ public class AccountService {
         Transfer transfer = new Transfer();
         transfer.setTransferType("Send");
         transfer.setUserFrom(currentUser.getUser().getUsername());
-        System.out.print("Who would you like to transfer this to? Please type in their username (case-sensitive): ");
-        String userTo = input.nextLine();
+        String userTo = in.getResponse("Who would you like to transfer this to? Please type in their username (case-sensitive): ");
         transfer.setUserTo(userTo);
-        System.out.println("How much money would you like to send? ");
-        String amount = input.nextLine();
+        String amount = in.getResponse("How much money would you like to send? ");
         transfer.setAmount(new BigDecimal(amount));
         try {
             String url = baseUrl + "transfers";
@@ -151,20 +142,42 @@ public class AccountService {
         // transfer request added to list of transfers for both parties
         // TODO Auto-generated method stub
         try {
+            Transfer transfer = new Transfer();
+            transfer.setTransferType("Request");
+            transfer.setUserTo(currentUser.getUser().getUsername());
+            String userFrom = in.getResponse("Who would you like to request money from? Please type in their username (case-sensitive): ");
+            transfer.setUserFrom(userFrom);
+            String amount = in.getResponse("How much money would you like to request?");
+            transfer.setAmount(new BigDecimal(amount));
             String url = baseUrl + "transfers";
-            HttpEntity<Void> entity = constructEntity(currentUser);
+            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
+        } catch (Exception e) {
+            BasicLogger.log(e.getMessage());
         }
     }
 
-    private void approveTransfer(){
-
+    // prior 'approveTransfer'
+    public void updateTransfer(AuthenticatedUser currentUser) {
+        // approve transfer method
+        // require user authentication
+        // changes status to 'approved' or 'rejected'
+        // if approved, decrease sender account & increase receiver account
+        // if rejected, no change to accounts
+        try {
+            Transfer transfer = new Transfer();
+            String transferId = in.getResponse("Which transfer would you like to update? ");
+            transfer.setTransferId(Integer.parseInt(transferId));
+            String url = baseUrl + "transfers/{id}";
+            String transferStatus = in.getResponse("Would you like to Approve or Reject? ");
+            transfer.setStatus(transferStatus);
+            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
+            restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+        } catch (Exception e) {
+            BasicLogger.log(e.getMessage());
+        }
     }
-    // approve transfer method
-    // require user authentication
-    // changes status to 'approved' or 'rejected'
-    // if approved, decrease sender account & increase receiver account
-    // if rejected, no change to accounts
+
 
     private HttpEntity<Void> constructBlankEntity(AuthenticatedUser currentUser) {
         HttpHeaders headers = new HttpHeaders();

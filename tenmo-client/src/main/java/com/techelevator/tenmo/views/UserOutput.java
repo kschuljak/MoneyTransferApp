@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.views;
 
 
+import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.UserCredentials;
 
 import java.math.BigDecimal;
@@ -108,6 +109,16 @@ public class UserOutput
     public void printErrorMessage()
     {
         System.out.println("An error occurred. Check the log for details.");
+    }
+
+    public void printTransfer(Transfer transfer) {
+        System.out.print("Transfer id: " + transfer.getTransferId() + " | ");
+        System.out.print("Transfer type: " + transfer.getTransferType() + " | ");
+        System.out.print("Status: " + transfer.getStatus() + " | ");
+        System.out.print("From user: " + transfer.getUserFrom() + " | ");
+        System.out.print("To user: " + transfer.getUserTo() + " | ");
+        System.out.print("Amount: " + transfer.getAmount());
+        System.out.println();
     }
 
 }

@@ -4,7 +4,7 @@ import java.math.BigDecimal;
 
 public class Transfer {
     private int transferId;
-    private String transferType;
+    private String transferType = "";
     private String transferStatus = "";
     private int accountFrom;
     private int accountTo;

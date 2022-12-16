@@ -77,10 +77,12 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    public void updateTransferStatus(int transferId, String newTransferStatus) {
-        String sqlQuery = "UPDATE transfer SET transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = ?)\n" +
-                "WHERE transfer_id = ?;";
-        jdbcTemplate.update(sqlQuery, newTransferStatus, transferId);
+    public void updateTransferStatus(String username, int transferId, String newTransferStatus) {
+        String sqlQuery = "UPDATE transfer\n" +
+                "SET transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = ?)\n" +
+                "WHERE transfer_id = ? AND account_from = " +
+                "(SELECT account_id FROM account JOIN tenmo_user ON account.account_id = tenmo_user.user_id WHERE username = ?);\n";
+        jdbcTemplate.update(sqlQuery, newTransferStatus, transferId, username);
     }
 
     @Override

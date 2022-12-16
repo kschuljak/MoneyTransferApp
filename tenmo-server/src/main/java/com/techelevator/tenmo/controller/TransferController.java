@@ -45,5 +45,9 @@ public class TransferController {
         return transferDao.getAllPendingTransfersByUsername(username);
     }
 
-    @RequestMapping(path = "/")
+    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
+    public void updateTransferStatus(Principal principal, int transferId, String newTransferStatus){
+        String username = principal.getName();
+        transferDao.updateTransferStatus(username, transferId, newTransferStatus);
+    }
 }
