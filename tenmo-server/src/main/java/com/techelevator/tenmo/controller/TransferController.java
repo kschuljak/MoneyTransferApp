@@ -38,4 +38,12 @@ public class TransferController {
         Transfer transfer = new Transfer(transferType, accountFrom, accountTo, amount);
         return transferDao.createTransfer(transfer);
     }
+
+    @RequestMapping(path = "?status=pending", method = RequestMethod.GET)
+    public List<Transfer> getPendingTransfers(Principal principal) {
+        String username = principal.getName();
+        return transferDao.getAllPendingTransfersByUsername(username);
+    }
+
+    @RequestMapping(path = "/")
 }

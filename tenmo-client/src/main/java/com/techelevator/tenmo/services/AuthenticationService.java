@@ -11,11 +11,10 @@ import org.springframework.web.client.RestTemplate;
 public class AuthenticationService
 {
 
-    protected final String baseUrl;
-    protected final RestTemplate restTemplate = new RestTemplate();
+    private final String baseUrl;
+    private final RestTemplate restTemplate = new RestTemplate();
 
-    public AuthenticationService(String url)
-    {
+    public AuthenticationService(String url) {
         this.baseUrl = url;
     }
 

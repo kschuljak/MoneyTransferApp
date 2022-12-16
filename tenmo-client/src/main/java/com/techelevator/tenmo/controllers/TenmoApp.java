@@ -2,6 +2,7 @@ package com.techelevator.tenmo.controllers;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.UserCredentials;
+import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.views.UserOutput;
 
@@ -12,6 +13,7 @@ public class TenmoApp
 
     private final UserOutput userOutput = new UserOutput();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
+    private final AccountService accountService = new AccountService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
 
@@ -81,23 +83,23 @@ public class TenmoApp
             menuSelection = userOutput.promptForMenuSelection("Please choose an option: ");
             if (menuSelection == 1)
             {
-                viewCurrentBalance();
+                accountService.viewCurrentBalance(currentUser);
             }
             else if (menuSelection == 2)
             {
-                viewTransferHistory();
+                accountService.viewTransferHistory(currentUser);
             }
             else if (menuSelection == 3)
             {
-                viewPendingRequests();
+                accountService.viewPendingRequests(currentUser);
             }
             else if (menuSelection == 4)
             {
-                sendBucks();
+                accountService.sendBucks(currentUser);
             }
             else if (menuSelection == 5)
             {
-                requestBucks();
+                accountService.requestBucks(currentUser);
             }
             else if (menuSelection == 0)
             {
@@ -110,58 +112,4 @@ public class TenmoApp
             userOutput.pause();
         }
     }
-
-    private void viewCurrentBalance() // require user authentication
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void viewTransferHistory() // require user authentication
-    {
-        // sent & received & requested
-        // TODO Auto-generated method stub
-
-    }
-
-    private void viewPendingRequests() // require user authentication
-    {
-        // TODO Auto-generated method stub
-
-    }
-
-    private void sendBucks() // require user authentication
-    {
-        // user can't send money to themselves
-        // user can't send more than their current balance
-        // user can't send 0 or negative money
-        // decrease sender (user) account & increase receiver account
-        // initial status = 'approved'
-        // TODO Auto-generated method stub
-
-    }
-
-    private void requestBucks() // require user authentication
-    {
-        // choose from a list of users to request from
-        // user can't request money from themselves
-        // user can't request 0 or negative money
-        // transfer includes user id of both & money amount
-        // initial status = 'pending'
-        // account balances unaltered until request is approved
-        // transfer request added to list of transfers for both parties
-        // TODO Auto-generated method stub
-
-    }
-
-    private void approveTransfer(){
-
-    }
-    // approve transfer method
-    // require user authentication
-    // changes status to 'approved' or 'rejected'
-    // if approved, decrease sender account & increase receiver account
-    // if rejected, no change to accounts
-
-
 }

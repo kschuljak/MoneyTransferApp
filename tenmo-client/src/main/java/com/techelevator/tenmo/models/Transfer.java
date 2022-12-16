@@ -8,6 +8,7 @@ public class Transfer {
     private String userFrom;
     private String userTo;
     private BigDecimal amount;
+    private String status;
 
     public String getTransferType() {
         return transferType;
@@ -39,5 +40,13 @@ public class Transfer {
 
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
