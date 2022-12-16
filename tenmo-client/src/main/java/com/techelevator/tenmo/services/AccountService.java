@@ -59,7 +59,7 @@ public class AccountService {
         // TODO Auto-generated method stub
         Account account = null;
         try {
-            String url = baseUrl + "account?username=" + currentUser.getUser().getUsername();
+            String url = baseUrl + "accounts?username=" + currentUser.getUser().getUsername();
             HttpEntity<Void> entity = constructBlankEntity(currentUser);
             ResponseEntity<Account> response = restTemplate.exchange(url, HttpMethod.GET, entity, Account.class);
             account = response.getBody();

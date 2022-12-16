@@ -4,7 +4,9 @@ import com.techelevator.tenmo.model.Account;
 import com.techelevator.tenmo.model.User;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
+import org.springframework.stereotype.Component;
 
+@Component
 public class JdbcAccountDao implements AccountDao {
     private final JdbcTemplate jdbcTemplate;
     public JdbcAccountDao(JdbcTemplate jdbcTemplate){

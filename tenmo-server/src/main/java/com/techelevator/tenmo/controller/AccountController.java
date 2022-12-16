@@ -16,7 +16,7 @@ public class AccountController {
         this.accountDao = accountDao;
     }
 
-    @RequestMapping(value = "/?username={username}", method = RequestMethod.GET)
+    @RequestMapping(value = "?username={username}", method = RequestMethod.GET)
     public Account getAccountByUsername(@PathVariable String username){
         return accountDao.getAccountByUsername(username);
     }
