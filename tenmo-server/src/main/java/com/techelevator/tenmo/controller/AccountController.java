@@ -2,10 +2,7 @@ package com.techelevator.tenmo.controller;
 
 import com.techelevator.tenmo.dao.AccountDao;
 import com.techelevator.tenmo.model.Account;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/accounts")
@@ -16,8 +13,8 @@ public class AccountController {
         this.accountDao = accountDao;
     }
 
-    @RequestMapping(value = "?username={username}", method = RequestMethod.GET)
-    public Account getAccountByUsername(@PathVariable String username){
+    @RequestMapping(value = "", method = RequestMethod.GET)
+    public Account getAccountByUsername(@RequestParam String username){
         return accountDao.getAccountByUsername(username);
     }
 }

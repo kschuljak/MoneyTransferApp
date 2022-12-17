@@ -3,10 +3,7 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.model.dto.TransferDto;
 import com.techelevator.tenmo.model.Transfer;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
 import java.security.Principal;
@@ -22,9 +19,13 @@ public class TransferController {
     }
 
     @RequestMapping(path = "", method = RequestMethod.GET)
-    public List<Transfer> getAllTransfers(Principal principal) {
+    public List<Transfer> getAllTransfers(Principal principal, @RequestParam(required = false) String status) {
         String username = principal.getName();
-        return transferDao.getAllTransfersByUsername(username);
+        if (status == null) {
+            return transferDao.getAllTransfersByUsername(username);
+        } else {
+            return transferDao.getAllPendingTransfersByUsername(username);
+        }
     }
 
     @RequestMapping(path = "", method = RequestMethod.POST)
@@ -35,12 +36,6 @@ public class TransferController {
         BigDecimal amount = transferDto.getAmount();
         Transfer transfer = new Transfer(transferType, usernameFrom, usernameTo, amount);
         return transferDao.createTransfer(transfer);
-    }
-
-    @RequestMapping(path = "?status=pending", method = RequestMethod.GET)
-    public List<Transfer> getPendingTransfers(Principal principal) {
-        String username = principal.getName();
-        return transferDao.getAllPendingTransfersByUsername(username);
     }
 
     @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
