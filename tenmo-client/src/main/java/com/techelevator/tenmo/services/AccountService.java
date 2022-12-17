@@ -170,7 +170,7 @@ public class AccountService {
             transfer.setTransferId(Integer.parseInt(transferId));
             String url = baseUrl + "transfers/{id}";
             String transferStatus = in.getResponse("Would you like to Approve or Reject? ");
-            transfer.setStatus(transferStatus);
+            transfer.setTransferStatus(transferStatus);
             HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
         } catch (Exception e) {

@@ -9,7 +9,7 @@ public class Transfer {
     private String userFrom;
     private String userTo;
     private BigDecimal amount;
-    private String status;
+    private String transferStatus;
 
     public int getTransferId() {
         return transferId;
@@ -51,11 +51,11 @@ public class Transfer {
         this.amount = amount;
     }
 
-    public String getStatus() {
-        return status;
+    public String getTransferStatus() {
+        return transferStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setTransferStatus(String transferStatus) {
+        this.transferStatus = transferStatus;
     }
 }

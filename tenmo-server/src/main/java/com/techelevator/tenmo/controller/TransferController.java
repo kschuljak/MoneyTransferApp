@@ -33,9 +33,7 @@ public class TransferController {
         String usernameFrom = transferDto.getUserFrom();
         String usernameTo = transferDto.getUserTo();
         BigDecimal amount = transferDto.getAmount();
-        int accountFrom = transferDao.getAccountIdByUsername(usernameFrom);
-        int accountTo = transferDao.getAccountIdByUsername(usernameTo);
-        Transfer transfer = new Transfer(transferType, accountFrom, accountTo, amount);
+        Transfer transfer = new Transfer(transferType, usernameFrom, usernameTo, amount);
         return transferDao.createTransfer(transfer);
     }
 

@@ -6,14 +6,14 @@ public class Transfer {
     private int transferId;
     private String transferType = "";
     private String transferStatus = "";
-    private int accountFrom;
-    private int accountTo;
+    private String userFrom;
+    private String userTo;
     private BigDecimal amount;
 
-    public Transfer(String transferType, int accountFrom, int accountTo, BigDecimal amount) {
+    public Transfer(String transferType, String userFrom, String userTo, BigDecimal amount) {
         this.transferType = transferType;
-        this.accountFrom = accountFrom;
-        this.accountTo = accountTo;
+        this.userFrom = userFrom;
+        this.userTo = userTo;
         this.amount = amount;
         switch (transferType) {
             case "Send":
@@ -52,20 +52,20 @@ public class Transfer {
         this.transferStatus = transferStatus;
     }
 
-    public int getAccountFrom() {
-        return accountFrom;
+    public String getUserFrom() {
+        return userFrom;
     }
 
-    public void setAccountFrom(int accountFrom) {
-        this.accountFrom = accountFrom;
+    public void setUserFrom(String userFrom) {
+        this.userFrom = userFrom;
     }
 
-    public int getAccountTo() {
-        return accountTo;
+    public String getUserTo() {
+        return userTo;
     }
 
-    public void setAccountTo(int accountTo) {
-        this.accountTo = accountTo;
+    public void setUserTo(String userTo) {
+        this.userTo = userTo;
     }
 
     public BigDecimal getAmount() {
