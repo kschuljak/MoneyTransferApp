@@ -107,6 +107,10 @@ public class UserOutput
         scanner.nextLine();
     }
 
+    public void printInvalidChoice() {
+        System.out.println("That is not a valid selection.");
+    }
+
     public void printErrorMessage()
     {
         System.out.println("An error occurred. Check the log for details.");

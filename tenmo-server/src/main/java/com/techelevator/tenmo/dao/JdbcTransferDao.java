@@ -111,9 +111,9 @@ public class JdbcTransferDao implements TransferDao {
 //        if (!isValidTransfer(transfer)) {
 //            return false;
 //        }
-        String sqlQuery = "BEGIN TRANSACTION " +
-                "UPDATE account SET balance = (balance + ?) WHERE account_id = ?; " +
-                "UPDATE account SET balance = (balance - ?) WHERE account_id = ?; " +
+        String sqlQuery = "BEGIN TRANSACTION;\n" +
+                "UPDATE account SET balance = balance+? WHERE account_id = ?;\n" +
+                "UPDATE account SET balance = balance-? WHERE account_id = ?;\n" +
                 "COMMIT;";
         jdbcTemplate.update(sqlQuery, amount, accountTo, amount, accountFrom);
         return true;

@@ -147,6 +147,7 @@ public class AccountService {
             String url = baseUrl + "transfers";
             HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
+            System.out.println("Transfer sent to " + userTo);
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
@@ -192,7 +193,7 @@ public class AccountService {
             transfer.setTransferId(Integer.parseInt(transferId));
             String url = baseUrl + "transfers/" + transferId + "/";
             String transferStatusNumber = in.getResponse("Would you like to approve or reject?\n1: Approve\n2: Reject\n\nPlease choose an option: ");
-            String transferStatus;
+            String transferStatus = "";
             switch (transferStatusNumber) {
                 case "1":
                     transferStatus = "Approved";
@@ -201,12 +202,14 @@ public class AccountService {
                     transferStatus = "Rejected";
                     break;
                 default:
-                    transferStatus = "";
+                    out.printInvalidChoice();
                     break;
             }
-            transfer.setTransferStatus(transferStatus);
-            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
-            restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+            if (!transferStatus.equals("")) {
+                transfer.setTransferStatus(transferStatus);
+                HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
+                restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+            }
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }

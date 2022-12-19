@@ -20,8 +20,7 @@ public class Validation {
         return value > 0;
     }
 
-    public boolean amountNotMoreThanBalance(Account account, BigDecimal amount){
-        BigDecimal balance = account.getAmount();
+    public boolean amountNotMoreThanBalance(BigDecimal balance, BigDecimal amount){
         return (balance.compareTo(amount) >= 0);
     }
 
