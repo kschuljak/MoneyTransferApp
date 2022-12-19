@@ -38,9 +38,11 @@ public class TransferController {
         return transferDao.createTransfer(transfer);
     }
 
-    @RequestMapping(path = "/{id}", method = RequestMethod.PUT)
-    public void updateTransferStatus(Principal principal, int transferId, String newTransferStatus){
+    @RequestMapping(path = "/{transferId}", method = RequestMethod.PUT)
+    public void updateTransferStatus(Principal principal, @PathVariable String transferId, @RequestBody Transfer transfer){
+        int transferIdNumeric = Integer.parseInt(transferId);
+        String newTransferStatus = transfer.getTransferStatus();
         String username = principal.getName();
-        transferDao.updateTransferStatus(username, transferId, newTransferStatus);
+        transferDao.updateTransferStatus(username, transferIdNumeric, newTransferStatus);
     }
 }

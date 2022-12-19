@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Collectors;
 
 public class AccountService {
 
@@ -93,17 +94,37 @@ public class AccountService {
     {
         // TODO Auto-generated method stub
         List<Transfer> transfers = new ArrayList<>();
+        List<Transfer> filteredTransfers = new ArrayList<>();
         try {
             String url = baseUrl + "transfers?status=pending";
             HttpEntity<Void> entity = constructBlankEntity(currentUser);
             ResponseEntity<Transfer[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer[].class);
             transfers = Arrays.asList(response.getBody());
+            String pendingRequestsChoice = in.getResponse("Would you like to:\n1: View all pending requests\n2: " +
+                    "View received and pending requests\n3: View sent and pending requests\n");
+            switch (pendingRequestsChoice) {
+                case "1":
+                    filteredTransfers = transfers;
+                    break;
+                case "2":
+                    filteredTransfers = transfers.stream().filter(transfer -> transfer.getUserFrom().equals(currentUser.getUser().
+                            getUsername())).collect(Collectors.toList());
+                    break;
+                case "3":
+                    filteredTransfers = transfers.stream().filter(transfer -> transfer.getUserTo().equals(currentUser.getUser().
+                            getUsername())).collect(Collectors.toList());
+                    break;
+            }
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
 
-        for (Transfer transfer : transfers) {
+        for (Transfer transfer : filteredTransfers) {
             out.printTransfer(transfer);
+        }
+
+        if (filteredTransfers.size() == 0) {
+            System.out.println("You have no pending requests of this type.");
         }
     }
 
@@ -165,11 +186,24 @@ public class AccountService {
         // if approved, decrease sender account & increase receiver account
         // if rejected, no change to accounts
         try {
+            viewPendingRequests(currentUser);
             Transfer transfer = new Transfer();
             String transferId = in.getResponse("Which transfer would you like to update? ");
             transfer.setTransferId(Integer.parseInt(transferId));
-            String url = baseUrl + "transfers/{id}";
-            String transferStatus = in.getResponse("Would you like to Approve or Reject? ");
+            String url = baseUrl + "transfers/" + transferId + "/";
+            String transferStatusNumber = in.getResponse("Would you like to approve or reject?\n1: Approve\n2: Reject\n\nPlease choose an option: ");
+            String transferStatus;
+            switch (transferStatusNumber) {
+                case "1":
+                    transferStatus = "Approved";
+                    break;
+                case "2":
+                    transferStatus = "Rejected";
+                    break;
+                default:
+                    transferStatus = "";
+                    break;
+            }
             transfer.setTransferStatus(transferStatus);
             HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
