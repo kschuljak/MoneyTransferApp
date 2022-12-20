@@ -58,4 +58,10 @@ public class Transfer {
     public void setTransferStatus(String transferStatus) {
         this.transferStatus = transferStatus;
     }
+
+    public void setTransferTypeAndStatus(String transferType) {
+        this.transferType = transferType;
+        if (transferType.equalsIgnoreCase("Send")) this.transferStatus = "Approved";
+        else if (transferType.equalsIgnoreCase("Request")) this.transferStatus = "Pending";
+    }
 }

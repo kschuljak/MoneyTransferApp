@@ -28,6 +28,11 @@ public class TransferController {
         }
     }
 
+    @RequestMapping(path = "/{transferId}", method = RequestMethod.GET)
+    public Transfer getTransferById(@PathVariable String transferId) {
+        return transferDao.getTransferById(Integer.parseInt(transferId));
+    }
+
     @RequestMapping(path = "", method = RequestMethod.POST)
     public boolean createTransfer(@RequestBody TransferDto transferDto) {
         String transferType = transferDto.getTransferType();

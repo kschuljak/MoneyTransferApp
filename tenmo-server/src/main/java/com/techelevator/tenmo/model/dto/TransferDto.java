@@ -17,21 +17,6 @@ public class TransferDto {
     @NotEmpty
     private BigDecimal amount;
 
-//    public TransferDto(String transferType, int accountFrom, int accountTo, BigDecimal amount) {
-//        this.transferType = transferType;
-//        this.accountFrom = accountFrom;
-//        this.accountTo = accountTo;
-//        this.amount = amount;
-//        switch (transferType) {
-//            case "Send":
-//                transferStatus = "Approved";
-//                break;
-//            case "Request":
-//                transferStatus = "Pending";
-//                break;
-//        }
-//    }
-
 
     public int getTransferId() {
         return transferId;
@@ -47,14 +32,6 @@ public class TransferDto {
 
     public void setTransferType(String transferType) {
         this.transferType = transferType;
-        switch (transferType) {
-            case "Send":
-                transferStatus = "Approved";
-                break;
-            case "Request":
-                transferStatus = "Pending";
-                break;
-        }
     }
 
     public String getTransferStatus() {
@@ -88,6 +65,5 @@ public class TransferDto {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-
 
 }
