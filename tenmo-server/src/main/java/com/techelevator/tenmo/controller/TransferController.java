@@ -3,6 +3,7 @@ package com.techelevator.tenmo.controller;
 import com.techelevator.tenmo.dao.TransferDao;
 import com.techelevator.tenmo.model.dto.TransferDto;
 import com.techelevator.tenmo.model.Transfer;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.math.BigDecimal;
@@ -33,6 +34,7 @@ public class TransferController {
         return transferDao.getTransferById(Integer.parseInt(transferId));
     }
 
+    @ResponseStatus(HttpStatus.CREATED)
     @RequestMapping(path = "", method = RequestMethod.POST)
     public boolean createTransfer(@RequestBody TransferDto transferDto) {
         String transferType = transferDto.getTransferType();
@@ -44,10 +46,10 @@ public class TransferController {
     }
 
     @RequestMapping(path = "/{transferId}", method = RequestMethod.PUT)
-    public void updateTransferStatus(Principal principal, @PathVariable String transferId, @RequestBody Transfer transfer){
+    public void updateTransfer(Principal principal, @PathVariable("transferId") String transferId, @RequestBody TransferDto transferDto){
         int transferIdNumeric = Integer.parseInt(transferId);
-        String newTransferStatus = transfer.getTransferStatus();
+        String newTransferStatus = transferDto.getTransferStatus();
         String username = principal.getName();
-        transferDao.updateTransferStatus(username, transferIdNumeric, newTransferStatus);
+        transferDao.updateTransfer(username, transferIdNumeric, newTransferStatus);
     }
 }

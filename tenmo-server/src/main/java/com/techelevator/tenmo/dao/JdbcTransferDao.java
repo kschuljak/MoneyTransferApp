@@ -74,6 +74,10 @@ public class JdbcTransferDao implements TransferDao {
         if (transferId == null) {
             return false;
         }
+        Transfer newTransfer = getTransferById(transferId);
+        if (newTransfer.getTransferType().equals("Send")) {
+            sendTransfer(transfer);
+        }
         return true;
     }
 
@@ -97,34 +101,57 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
-    public void updateTransferStatus(String username, int transferId, String newTransferStatus) {
-        String sqlQuery = "UPDATE transfer\n" +
-                "SET transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = ?)\n" +
-                "WHERE transfer_id = ? AND account_from =\n" +
-                "\t(SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE username = ?);";
-        jdbcTemplate.update(sqlQuery, newTransferStatus, transferId, username);
-        if (newTransferStatus.equals("Approved")) {
-            Transfer transfer = getTransferById(transferId);
-            sendTransfer(transfer);
-        }
+    public void updateTransfer(String username, int transferId, String newTransferStatus) {
+        Transfer transfer = getTransferById(transferId);
+      if (newTransferStatus.equals("Approved")) {
+          boolean transactionCompleted = approveTransfer(username, transfer);
+      }
+      if (newTransferStatus.equals("Rejected")) {
+          boolean transactionCompleted = rejectTransfer(username, transfer);
+      }
     }
 
-    @Override
+    private boolean approveTransfer(String username, Transfer transfer) {
+        int transferId = transfer.getTransferId();
+        String accountTo = transfer.getUserTo();
+        String accountFrom = transfer.getUserFrom();
+        if (!accountFrom.equalsIgnoreCase(username)) return false;
+        if (!isValidTransfer(transfer)) return false;
+        BigDecimal amount = transfer.getAmount();
+        String sqlQuery = "BEGIN TRANSACTION; " +
+                "UPDATE account SET balance = balance + ? WHERE account_id = " +
+                "  (SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE username = ?); " +
+                "UPDATE account SET balance = balance - ? WHERE account_id = " +
+                "  (SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE username = ?); " +
+                "UPDATE transfer SET transfer_status_id = " +
+                "  (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = 'Approved')" +
+                "WHERE transfer_id = ? AND account_from = " +
+                "  (SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE username = ?);" +
+                "COMMIT;";
+        jdbcTemplate.update(sqlQuery, amount, accountTo, amount, accountFrom, transferId, username);
+        return true;
+    }
+
+    private boolean rejectTransfer(String username, Transfer transfer) {
+        String accountFrom = transfer.getUserFrom();
+        int transferId = transfer.getTransferId();
+        if (!accountFrom.equalsIgnoreCase(username)) return false;
+        String sqlQuery = "BEGIN TRANSACTION; " +
+                "UPDATE transfer SET transfer_status_id = " +
+                "  (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = 'Rejected')" +
+                "WHERE transfer_id = ? AND account_from = " +
+                "  (SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE username = ?);" +
+                "COMMIT;";
+        jdbcTemplate.update(sqlQuery, transferId, username);
+        return true;
+    }
+
+
     public boolean sendTransfer(Transfer transfer) {
         // account_from (money out), account_to (money in)
-        // TODO (maybe?) add in validation for transaction completion
-        int transferId = transfer.getTransferId();
-        String accountFrom = transfer.getUserFrom();
-        String accountTo = transfer.getUserTo();
-        BigDecimal amount = transfer.getAmount();
-        if (!isValidTransfer(transfer)) {
-            return false;
-        }
-        String sqlQuery = "BEGIN TRANSACTION;\n" +
-                "UPDATE account SET balance = balance+? WHERE account_id = ?;\n" +
-                "UPDATE account SET balance = balance-? WHERE account_id = ?;\n" +
-                "COMMIT;";
-        jdbcTemplate.update(sqlQuery, amount, accountTo, amount, accountFrom);
+        String username = transfer.getUserFrom();
+        if (!isValidTransfer(transfer)) return false;
+        else approveTransfer(username, transfer);
         return true;
     }
 
@@ -136,10 +163,8 @@ public class JdbcTransferDao implements TransferDao {
         String sqlQuery = "SELECT balance FROM account WHERE account_id = ?";
         BigDecimal balance = jdbcTemplate.queryForObject(sqlQuery, BigDecimal.class, userFrom);
 
-        if (balance != null) {
-            return balance.compareTo(amount) >= 0;
-        }
-        return false;
+        if (balance == null) return false;
+        else return balance.compareTo(amount) >= 0;
     }
 
     public int getAccountIdByUsername(String username) {

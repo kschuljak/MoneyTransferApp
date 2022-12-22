@@ -5,12 +5,14 @@ import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.views.UserInput;
 import com.techelevator.tenmo.views.UserOutput;
 import com.techelevator.util.BasicLogger;
+
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.util.Scanner;
 
 public class TransferService {
 
@@ -22,8 +24,6 @@ public class TransferService {
     public TransferService(String baseUrl) {
         this.baseUrl = baseUrl;
     }
-
-    public TransferService() { };
 
     public void sendBucks(AuthenticatedUser currentUser) // require user authentication
     {
@@ -41,9 +41,7 @@ public class TransferService {
         String amount = in.getResponse("How much money would you like to send? ");
         transfer.setAmount(new BigDecimal(amount));
         try {
-            String url = baseUrl + "transfers";
-            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
-            restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
+            createTransfer(currentUser, transfer);
             System.out.println("Transfer sent to " + userTo);
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
@@ -60,25 +58,30 @@ public class TransferService {
         // account balances unaltered until request is approved
         // transfer request added to list of transfers for both parties
         // TODO Auto-generated method stub
+        Transfer transfer = new Transfer();
+        transfer.setTransferTypeAndStatus("Request");
+        transfer.setUserTo(currentUser.getUser().getUsername());
+        String userFrom = in.getResponse("Who would you like to request money from? Please type in their username (case-sensitive): ");
+        transfer.setUserFrom(userFrom);
+        String amount = in.getResponse("How much money would you like to request?");
+        transfer.setAmount(new BigDecimal(amount));
         try {
-            Transfer transfer = new Transfer();
-            transfer.setTransferTypeAndStatus("Request");
-            transfer.setUserTo(currentUser.getUser().getUsername());
-            String userFrom = in.getResponse("Who would you like to request money from? Please type in their username (case-sensitive): ");
-            transfer.setUserFrom(userFrom);
-            String amount = in.getResponse("How much money would you like to request?");
-            transfer.setAmount(new BigDecimal(amount));
-            String url = baseUrl + "transfers";
-            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
-            restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
+            createTransfer(currentUser, transfer);
+            System.out.println("Transfer requested from " + userFrom);
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
     }
 
-    public void completeTransfer(AuthenticatedUser currentUser, Transfer transfer)
+    public void createTransfer(AuthenticatedUser currentUser, Transfer transfer)
     {
-
+        try {
+            String url = baseUrl + "transfers" + "/" + transfer.getTransferId();
+            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
+            restTemplate.exchange(url, HttpMethod.POST, entity, Transfer.class);
+        } catch (Exception e) {
+            BasicLogger.log(e.getMessage());
+        }
     }
 
     private HttpEntity<Transfer> constructTransferEntity(AuthenticatedUser currentUser, Transfer transfer) {

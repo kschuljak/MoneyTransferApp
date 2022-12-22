@@ -11,7 +11,6 @@ public interface TransferDao {
 
     boolean createTransfer(Transfer transfer);
     Transfer getTransferById(int transferId);
-    void updateTransferStatus(String username, int transferId, String newTransferStatus);
-    boolean sendTransfer(Transfer transfer);
+    void updateTransfer(String username, int transferId, String newTransferStatus);
     int getAccountIdByUsername(String username);
 }
