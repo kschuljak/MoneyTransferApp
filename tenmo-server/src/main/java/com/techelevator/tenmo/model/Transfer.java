@@ -42,16 +42,7 @@ public class Transfer {
 
     public void setTransferType(String transferType) {
         this.transferType = transferType;
-        switch (transferType) {
-            case "Send":
-                this.transferStatus = "Approved";
-                break;
-            case "Request":
-                this.transferStatus = "Pending";
-                break;
-        }
     }
-
 
     public String getTransferStatus() {
         return transferStatus;
@@ -84,6 +75,4 @@ public class Transfer {
     public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
-
-
 }
