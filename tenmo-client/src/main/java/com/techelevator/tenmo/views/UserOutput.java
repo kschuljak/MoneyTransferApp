@@ -5,6 +5,7 @@ import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
+import com.techelevator.tenmo.views.Colors;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -148,6 +149,10 @@ public class UserOutput
     public void printNoPendingRequests() {
         System.out.println();
         System.out.println("You have no pending requests of this type.");
+    }
+
+    public void printRed(String message) {
+        System.out.println(Colors.RED_FONT + message + Colors.RESET);
     }
 
     public void printFormattedTransfer(Transfer transfer) {
