@@ -122,4 +122,11 @@ public class UserOutput
         System.out.println();
     }
 
+    public void printMessage(String message){
+        System.out.println(message);
+    }
+
+    public void printSpace(){
+        System.out.println();
+    }
 }
