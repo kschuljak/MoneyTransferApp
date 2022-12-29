@@ -14,8 +14,6 @@ public class ValidationTest {
 
     @Before
     public void setUp() {
-        Validation validationService;
-
         User user1 = new User();
         user1.setUsername("username1");
         AuthenticatedUser authuser1 = new AuthenticatedUser();
@@ -30,8 +28,6 @@ public class ValidationTest {
     @Test
     public void recipientIsNotSelf_ReturnsTrue_GivenCurrentUser_NotSameAsUsername() {
         //arrange
-        Validation validationService = new Validation();
-
         User user1 = new User();
         user1.setUsername("username1");
         AuthenticatedUser authuser1 = new AuthenticatedUser();
@@ -40,7 +36,7 @@ public class ValidationTest {
         String requestedUser = "username2";
 
         //act
-        boolean isSame = validationService.recipientIsNotSelf(authuser1, requestedUser);
+        boolean isSame = Validation.recipientIsNotSelf(authuser1, requestedUser);
 
         //assert
         String message = "because user1 username is 'username1', and should not match 'username2'";
@@ -50,8 +46,6 @@ public class ValidationTest {
     @Test
     public void recipientIsNotSelf_ReturnsFalse_GivenCurrentUser_SameAsUsername() {
         //arrange
-        Validation validationService = new Validation();
-
         User user1 = new User();
         user1.setUsername("username1");
         AuthenticatedUser authuser1 = new AuthenticatedUser();
@@ -60,7 +54,7 @@ public class ValidationTest {
         String requestedUser = "username1";
 
         //act
-        boolean isSame = validationService.recipientIsNotSelf(authuser1, requestedUser);
+        boolean isSame = Validation.recipientIsNotSelf(authuser1, requestedUser);
 
         //assert
         String message = "because user1 username is 'username1', and requestedUser = 'username1'";
@@ -70,16 +64,14 @@ public class ValidationTest {
     @Test
     public void amountIsPositive_ReturnsTrue_GivenAmount_GreaterThanZero() {
         //arrange
-        Validation validationService = new Validation();
-
         String amount1 = "10.00";
         String amount2 = "2.00";
         String amount3 = "0.01";
 
         //act
-        boolean actual1 = validationService.amountIsPositive(amount1);
-        boolean actual2 = validationService.amountIsPositive(amount2);
-        boolean actual3 = validationService.amountIsPositive(amount3);
+        boolean actual1 = Validation.amountIsPositive(amount1);
+        boolean actual2 = Validation.amountIsPositive(amount2);
+        boolean actual3 = Validation.amountIsPositive(amount3);
 
         //assert
         String message1 = "Because amount is positive (amount = 10.00)";
@@ -93,16 +85,14 @@ public class ValidationTest {
     @Test
     public void amountIsPositive_ReturnsFalse_GivenAmount_LessThanOrEqualToZero() {
         //arrange
-        Validation validationService = new Validation();
-
         String amount1 = "10.00";
         String amount2 = "2.00";
         String amount3 = "0.01";
 
         //act
-        boolean actual1 = validationService.amountIsPositive(amount1);
-        boolean actual2 = validationService.amountIsPositive(amount2);
-        boolean actual3 = validationService.amountIsPositive(amount3);
+        boolean actual1 = Validation.amountIsPositive(amount1);
+        boolean actual2 = Validation.amountIsPositive(amount2);
+        boolean actual3 = Validation.amountIsPositive(amount3);
 
         //assert
         String message1 = "Because amount is positive (amount = 10.00)";
@@ -113,7 +103,21 @@ public class ValidationTest {
         assertTrue(message3, actual3);
     }
 
+//    @Test
+//    public void amountNotMoreThanBalance() {
+//    }
+
     @Test
-    public void amountNotMoreThanBalance() {
+    public void exceedsTransferLimit_ReturnsTrue_GivenAmount_GreaterThanLimit() {
+        //arrange
+        // account limit = $99,999.99
+        BigDecimal transferAmount = new BigDecimal("100000.00");
+
+        //act
+        boolean actual = Validation.exceedsTransferLimit(transferAmount);
+
+        //assert
+        String message = "Because amount exceeds balance limit";
+        assertTrue(message, actual);
     }
 }

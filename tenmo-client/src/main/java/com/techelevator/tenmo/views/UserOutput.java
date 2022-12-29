@@ -8,6 +8,7 @@ import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.views.Colors;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.List;
 import java.util.Scanner;
 
@@ -15,6 +16,7 @@ public class UserOutput
 {
 
     private final Scanner scanner = new Scanner(System.in);
+    public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###,###.00");
 
     public int promptForMenuSelection(String prompt)
     {
@@ -115,7 +117,7 @@ public class UserOutput
 
     public void printErrorMessage()
     {
-        System.out.println("An error occurred. Check the log for details.");
+        printRed("An error occurred. Check the log for details.");
     }
 
     public void printUsers(List<User> allUsers, AuthenticatedUser currentUser) {
@@ -129,13 +131,12 @@ public class UserOutput
     }
 
     public void printTransfer(Transfer transfer) {
-        printFormattedTransfer(transfer);
-//        System.out.print("Transfer id: " + transfer.getTransferId() + " | ");
-//        System.out.print("Transfer type: " + transfer.getTransferType() + " | ");
-//        System.out.print("Status: " + transfer.getTransferStatus() + " | ");
-//        System.out.print("From user: " + transfer.getUserFrom() + " | ");
-//        System.out.print("To user: " + transfer.getUserTo() + " | ");
-//        System.out.print("Amount: " + transfer.getAmount());
+        System.out.print("Transfer id: " + transfer.getTransferId() + " | ");
+        System.out.print("Transfer type: " + transfer.getTransferType() + " | ");
+        System.out.print("Status: " + transfer.getTransferStatus() + " | ");
+        System.out.print("From user: " + transfer.getUserFrom() + " | ");
+        System.out.print("To user: " + transfer.getUserTo() + " | ");
+        System.out.print("Amount: " + DECIMAL_FORMAT.format(transfer.getAmount()));
         System.out.println();
     }
 
@@ -154,38 +155,90 @@ public class UserOutput
 
     public void printSendMoneyToSelfMessage() {
         System.out.println();
-        System.out.println("You cannot send money to yourself.");
+        printRed("You cannot send money to yourself.");
     }
 
     public void printInsufficientFundsMessage() {
         System.out.println();
-        System.out.println("Insufficient funds.");
+        printRed("Insufficient funds.");
     }
 
     public void printNegativeAmountMessage() {
         System.out.println();
-        System.out.println("You cannot send or request a non-positive amount of money.");
+        printRed("You cannot send or request a non-positive amount of money.");
+    }
+
+    public void printExceedsTransferLimitMessage() {
+        System.out.println();
+        printRed("Transfers cannot exceed $99,999.99.");
     }
 
     public void printRed(String message) {
         System.out.println(Colors.RED_FONT + message + Colors.RESET);
     }
 
-    public void printFormattedTransfer(Transfer transfer) {
+    public void printTransferList(List<Transfer> transfers) {
+        int longestTo = 0;
+        int longestFrom = 0;
+        for (Transfer transfer : transfers) {
+            if (transfer.getUserFrom().length() > longestFrom) {
+                longestFrom = transfer.getUserFrom().length();
+            }
+            if (transfer.getUserTo().length() > longestTo) {
+                longestTo = transfer.getUserTo().length();
+            }
+        }
+        for (Transfer transfer : transfers) {
+            printFormattedTransfer(transfer, longestTo, longestFrom);
+        }
+    }
+
+    public void printBalance(BigDecimal balance){
+        String formattedBalance = DECIMAL_FORMAT.format(balance);
+        System.out.println("Your current balance is $" + formattedBalance);
+
+    }
+    public void printSingleTransfer(Transfer transfer) {
+        int longestTo = transfer.getUserTo().length();
+        int longestFrom = transfer.getUserFrom().length();
+        printFormattedTransfer(transfer, longestTo, longestFrom);
+    }
+
+    public void printFormattedTransfer(Transfer transfer, int longestTo, int longestFrom) {
         String transferId = String.valueOf(transfer.getTransferId());
         String transferType = transfer.getTransferType();
         String status = transfer.getTransferStatus();
         String fromUser = transfer.getUserFrom();
         String toUser = transfer.getUserTo();
-        String amount = String.valueOf(transfer.getAmount());
+        String amount = String.valueOf(DECIMAL_FORMAT.format(transfer.getAmount()));
 
-        String formatId = "Transfer id: " + String.format("%-6s", transferId) + " | ";
-        String formatType = "Type: " + String.format("%-10s", transferType) + " | ";
-        String formatStatus = "Status: " + String.format("%-10s", status) + " | ";
-        String formatUserFrom = "From user: " + String.format("%-10s", fromUser) + " | ";
-        String formatUserTo = "To user: " + String.format("%-10s", toUser) + " | ";
-        String formatAmount = "Amount: $" + String.format("%-7s", amount);
+        String formatUsernameTo = "%-" + longestTo + "s";
+        String formatUsernameFrom = "%-" + longestFrom + "s";
+        String formatId = "Transfer " + String.format("%-4s", transferId) + " | ";
+        String formatType = String.format("%-7s", transferType);
+        String formatStatus = String.format("%-8s", status);
+        String formatAmount = "$" + String.format("%-8s", amount) + " | ";
+        String formatUserFrom = "From: " + String.format(formatUsernameFrom, fromUser) + " | ";
+        String formatUserTo = "To: " + String.format(formatUsernameTo, toUser);
 
-        System.out.print(formatId + formatType + formatStatus + formatUserFrom + formatUserTo + formatAmount);
+        if (status.equalsIgnoreCase("approved")) {
+            formatStatus = Colors.GREEN_FONT + formatStatus + Colors.RESET;
+        } else if (status.equalsIgnoreCase("pending")) {
+            formatStatus = Colors.YELLOW_FONT + formatStatus + Colors.RESET;
+        } else if (status.equalsIgnoreCase("rejected")) {
+            formatStatus = Colors.RED_FONT + formatStatus + Colors.RESET;
+        }
+
+        if (transferType.equalsIgnoreCase("send")) {
+            formatType = Colors.PURPLE_FONT + formatType + Colors.RESET;
+        } else if (transferType.equalsIgnoreCase("request")) {
+            formatType = Colors.BLUE_FONT + formatType + Colors.RESET;
+        }
+
+        System.out.println(formatId + formatType + " | " + formatStatus + " | " + formatAmount + formatUserFrom + formatUserTo);
+    }
+
+    public void printInvalidUsername() {
+        printRed("That is not a valid user.");
     }
 }

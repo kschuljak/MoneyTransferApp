@@ -55,7 +55,12 @@ public class AccountService {
         return users;
     }
 
-    public BigDecimal viewCurrentBalance(AuthenticatedUser currentUser) // require user authentication
+    public void viewCurrentBalance(AuthenticatedUser currentUser) {
+        BigDecimal balance = getCurrentBalance(currentUser);
+        out.printBalance(balance);
+    }
+
+    public BigDecimal getCurrentBalance(AuthenticatedUser currentUser) // require user authentication
     {
         // TODO Auto-generated method stub
         Account account = null;
@@ -67,7 +72,6 @@ public class AccountService {
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
-        System.out.println("Your account balance is " + account.getAmount());
         return account.getAmount();
     }
 
@@ -86,16 +90,13 @@ public class AccountService {
             BasicLogger.log(e.getMessage());
         }
 
-        for (Transfer transfer : transfers) {
-            out.printTransfer(transfer);
-        }
-        out.printSpace();
+        out.printTransferList(transfers);
     }
 
     public void viewSpecificTransfer(AuthenticatedUser currentUser) {
         String transferId = in.getResponse("Which transfer would you like to view? ");
         Transfer transfer = viewSpecificTransfer(currentUser, transferId);
-        out.printTransfer(transfer);
+        out.printSingleTransfer(transfer);
     }
 
     public Transfer viewSpecificTransfer(AuthenticatedUser currentUser, String transferId) {
@@ -109,6 +110,7 @@ public class AccountService {
         }
         return null;
     }
+
 
     public void viewPendingRequests(AuthenticatedUser currentUser) // require user authentication
     {
@@ -138,9 +140,25 @@ public class AccountService {
         }
 
         out.printSpace();
-        for (Transfer transfer : transfers) {
-            out.printTransfer(transfer);
+        out.printTransferList(transfers);
+
+        if (transfers.size() == 0) {
+            out.printNoPendingRequests();
         }
+    }
+
+    public void viewPendingReceivedRequests(AuthenticatedUser currentUser) {
+        List<Transfer> transfers = new ArrayList<>();
+        try {
+            String url = baseUrl + "transfers?status=pending&sentto=user";
+            HttpEntity<Void> entity = constructBlankEntity(currentUser);
+            ResponseEntity<Transfer[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer[].class);
+            transfers = Arrays.asList(response.getBody());
+        } catch (Exception e) {
+            BasicLogger.log(e.getMessage());
+        }
+        out.printSpace();
+        out.printTransferList(transfers);
 
         if (transfers.size() == 0) {
             out.printNoPendingRequests();
@@ -165,6 +183,10 @@ public class AccountService {
             out.printSendMoneyToSelfMessage();
             return;
         }
+        if (!Validation.isValidUser(allUsers, userTo)) {
+            out.printInvalidUsername();
+            return;
+        }
         transfer.setUserTo(userTo);
         String amount = in.getResponse("How much money would you like to send? ");
         if (!Validation.amountIsPositive(amount)) {
@@ -172,15 +194,20 @@ public class AccountService {
             return;
         }
         BigDecimal numericAmount = new BigDecimal(amount);
-        if (!Validation.amountNotMoreThanBalance(viewCurrentBalance(currentUser), numericAmount)) {
+        if (!Validation.amountNotMoreThanBalance(getCurrentBalance(currentUser), numericAmount)) {
             out.printInsufficientFundsMessage();
             return;
         }
         transfer.setAmount(new BigDecimal(amount));
+        if (Validation.exceedsTransferLimit(transfer.getAmount())) {
+            out.printExceedsTransferLimitMessage();
+            return;
+        }
         try {
             String url = baseUrl + "transfers";
             HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
+            viewCurrentBalance(currentUser);
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
@@ -207,13 +234,22 @@ public class AccountService {
                 out.printSendMoneyToSelfMessage();
                 return;
             }
+            if (!Validation.isValidUser(allUsers, userFrom)) {
+                out.printInvalidUsername();
+                return;
+            }
             transfer.setUserFrom(userFrom);
-            String amount = in.getResponse("How much money would you like to request? ");
-            if (!Validation.amountIsPositive(amount)) {
+            String stringAmount = in.getResponse("How much money would you like to request? ");
+            BigDecimal amount = new BigDecimal(stringAmount);
+            if (!Validation.amountIsPositive(stringAmount)) {
                 out.printNegativeAmountMessage();
                 return;
             }
-            transfer.setAmount(new BigDecimal(amount));
+            if (Validation.exceedsTransferLimit(amount)) {
+                out.printExceedsTransferLimitMessage();
+                return;
+            }
+            transfer.setAmount(amount);
             String url = baseUrl + "transfers";
             HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
@@ -230,7 +266,7 @@ public class AccountService {
         // if approved, decrease sender account & increase receiver account
         // if rejected, no change to accounts
         try {
-            viewPendingRequests(currentUser);
+            viewPendingReceivedRequests(currentUser);
             out.printSpace();
             Transfer transfer = new Transfer();
             String transferId = in.getResponse("Which transfer would you like to update? ");
@@ -243,8 +279,12 @@ public class AccountService {
                 case "1":
                     transferStatus = "Approved";
                     BigDecimal transferAmount = viewSpecificTransfer(currentUser, transferId).getAmount();
-                    if (!Validation.amountNotMoreThanBalance(viewCurrentBalance(currentUser), transferAmount)) {
+                    if (!Validation.amountNotMoreThanBalance(getCurrentBalance(currentUser), transferAmount)) {
                         out.printInsufficientFundsMessage();
+                        return;
+                    }
+                    if (Validation.exceedsTransferLimit(transferAmount)) {
+                        out.printExceedsTransferLimitMessage();
                         return;
                     }
                     break;
@@ -258,6 +298,7 @@ public class AccountService {
             transfer.setTransferStatus(transferStatus);
             HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
+            viewCurrentBalance(currentUser);
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
