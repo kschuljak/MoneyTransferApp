@@ -148,4 +148,22 @@ public class UserOutput
         System.out.println();
         System.out.println("You have no pending requests of this type.");
     }
+
+    public void printFormattedTransfer(Transfer transfer) {
+        String transferId = String.valueOf(transfer.getTransferId());
+        String transferType = transfer.getTransferType();
+        String status = transfer.getTransferStatus();
+        String fromUser = transfer.getUserFrom();
+        String toUser = transfer.getUserTo();
+        String amount = String.valueOf(transfer.getAmount());
+
+        String formatId = "Transfer id: " + String.format("%-6s", transferId) + " | ";
+        String formatType = "Type: " + String.format("%-10s", transferType) + " | ";
+        String formatStatus = "Status: " + String.format("%-10s", status) + " | ";
+        String formatUserFrom = "From user: " + String.format("%-10s", fromUser) + " | ";
+        String formatUserTo = "To user: " + String.format("%-10s", toUser) + " | ";
+        String formatAmount = "Amount: $" + String.format("%-7s", amount);
+
+        System.out.print(formatId + formatType + formatStatus + formatUserFrom + formatUserTo + formatAmount);
+    }
 }
