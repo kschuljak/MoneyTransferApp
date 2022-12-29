@@ -5,6 +5,7 @@ import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
+import com.techelevator.tenmo.views.Colors;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -128,12 +129,13 @@ public class UserOutput
     }
 
     public void printTransfer(Transfer transfer) {
-        System.out.print("Transfer id: " + transfer.getTransferId() + " | ");
-        System.out.print("Transfer type: " + transfer.getTransferType() + " | ");
-        System.out.print("Status: " + transfer.getTransferStatus() + " | ");
-        System.out.print("From user: " + transfer.getUserFrom() + " | ");
-        System.out.print("To user: " + transfer.getUserTo() + " | ");
-        System.out.print("Amount: " + transfer.getAmount());
+        printFormattedTransfer(transfer);
+//        System.out.print("Transfer id: " + transfer.getTransferId() + " | ");
+//        System.out.print("Transfer type: " + transfer.getTransferType() + " | ");
+//        System.out.print("Status: " + transfer.getTransferStatus() + " | ");
+//        System.out.print("From user: " + transfer.getUserFrom() + " | ");
+//        System.out.print("To user: " + transfer.getUserTo() + " | ");
+//        System.out.print("Amount: " + transfer.getAmount());
         System.out.println();
     }
 
@@ -163,5 +165,27 @@ public class UserOutput
     public void printNegativeAmountMessage() {
         System.out.println();
         System.out.println("You cannot send or request a non-positive amount of money.");
+    }
+
+    public void printRed(String message) {
+        System.out.println(Colors.RED_FONT + message + Colors.RESET);
+    }
+
+    public void printFormattedTransfer(Transfer transfer) {
+        String transferId = String.valueOf(transfer.getTransferId());
+        String transferType = transfer.getTransferType();
+        String status = transfer.getTransferStatus();
+        String fromUser = transfer.getUserFrom();
+        String toUser = transfer.getUserTo();
+        String amount = String.valueOf(transfer.getAmount());
+
+        String formatId = "Transfer id: " + String.format("%-6s", transferId) + " | ";
+        String formatType = "Type: " + String.format("%-10s", transferType) + " | ";
+        String formatStatus = "Status: " + String.format("%-10s", status) + " | ";
+        String formatUserFrom = "From user: " + String.format("%-10s", fromUser) + " | ";
+        String formatUserTo = "To user: " + String.format("%-10s", toUser) + " | ";
+        String formatAmount = "Amount: $" + String.format("%-7s", amount);
+
+        System.out.print(formatId + formatType + formatStatus + formatUserFrom + formatUserTo + formatAmount);
     }
 }
