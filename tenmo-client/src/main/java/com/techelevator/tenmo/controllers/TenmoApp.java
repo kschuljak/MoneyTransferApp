@@ -1,9 +1,11 @@
 package com.techelevator.tenmo.controllers;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
+import com.techelevator.tenmo.services.TransferService;
 import com.techelevator.tenmo.views.UserOutput;
 import com.techelevator.util.BasicLogger;
 
@@ -15,6 +17,7 @@ public class TenmoApp
     private final UserOutput userOutput = new UserOutput();
     private final AuthenticationService authenticationService = new AuthenticationService(API_BASE_URL);
     private final AccountService accountService = new AccountService(API_BASE_URL);
+    private final TransferService transferService = new TransferService(API_BASE_URL);
 
     private AuthenticatedUser currentUser;
 
@@ -87,26 +90,26 @@ public class TenmoApp
             }
             else if (menuSelection == 2)
             {
-                accountService.viewTransferHistory(currentUser);
+                transferService.viewTransferHistory(currentUser);
             }
             else if (menuSelection == 3)
             {
-                accountService.viewPendingRequests(currentUser);
+                transferService.viewPendingRequests(currentUser);
             }
             else if (menuSelection == 4)
             {
-                accountService.sendBucks(currentUser);
+                transferService.sendBucks(currentUser);
             }
             else if (menuSelection == 5)
             {
-                accountService.requestBucks(currentUser);
+                transferService.requestBucks(currentUser);
             }
             else if (menuSelection == 6)
             {
-                accountService.updateTransfer(currentUser);
+                transferService.updateTransfer(currentUser);
             }
             else if (menuSelection == 7) {
-                accountService.viewSpecificTransfer(currentUser);
+                transferService.viewSpecificTransfer(currentUser);
             }
             else if (menuSelection == 0)
             {
