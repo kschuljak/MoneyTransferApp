@@ -129,4 +129,9 @@ public class UserOutput
     public void printSpace(){
         System.out.println();
     }
+
+    public void printNoPendingRequests() {
+        System.out.println();
+        System.out.println("You have no pending requests of this type.");
+    }
 }
