@@ -55,7 +55,7 @@ public class AccountService {
         return users;
     }
 
-    public void viewCurrentBalance(AuthenticatedUser currentUser) // require user authentication
+    public BigDecimal viewCurrentBalance(AuthenticatedUser currentUser) // require user authentication
     {
         // TODO Auto-generated method stub
         Account account = null;
@@ -68,6 +68,7 @@ public class AccountService {
             BasicLogger.log(e.getMessage());
         }
         System.out.println("Your account balance is " + account.getAmount());
+        return account.getAmount();
     }
 
     public void viewTransferHistory(AuthenticatedUser currentUser) // require user authentication
@@ -91,41 +92,57 @@ public class AccountService {
         out.printSpace();
     }
 
+    public void viewSpecificTransfer(AuthenticatedUser currentUser) {
+        String transferId = in.getResponse("Which transfer would you like to view? ");
+        Transfer transfer = viewSpecificTransfer(currentUser, transferId);
+        out.printTransfer(transfer);
+    }
+
+    public Transfer viewSpecificTransfer(AuthenticatedUser currentUser, String transferId) {
+        try {
+            String url = baseUrl + "transfers/" + transferId + "/";
+            HttpEntity<Void> entity = constructBlankEntity(currentUser);
+            ResponseEntity<Transfer> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer.class);
+            return response.getBody();
+        } catch (Exception e) {
+            BasicLogger.log(e.getMessage());
+        }
+        return null;
+    }
+
     public void viewPendingRequests(AuthenticatedUser currentUser) // require user authentication
     {
         // TODO Auto-generated method stub
         List<Transfer> transfers = new ArrayList<>();
         List<Transfer> filteredTransfers = new ArrayList<>();
         try {
-            String url = baseUrl + "transfers?status=pending";
+
+            String pendingRequestsChoice = in.getResponse("Would you like to:\n1: View all pending requests\n2: " +
+                    "View received and pending requests\n3: View sent and pending requests\n\nPlease choose an option: ");
+            String url = baseUrl + "transfers?status=pending";;
+            switch (pendingRequestsChoice) {
+                case "1":
+                    break;
+                case "2":
+                    url += "&sentto=user";
+                    break;
+                case "3":
+                    url += "&sentby=user";
+                    break;
+            }
             HttpEntity<Void> entity = constructBlankEntity(currentUser);
             ResponseEntity<Transfer[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer[].class);
             transfers = Arrays.asList(response.getBody());
-            String pendingRequestsChoice = in.getResponse("Would you like to:\n1: View all pending requests\n2: " +
-                    "View received and pending requests\n3: View sent and pending requests\n\nPlease choose an option: ");
-            switch (pendingRequestsChoice) {
-                case "1":
-                    filteredTransfers = transfers;
-                    break;
-                case "2":
-                    filteredTransfers = transfers.stream().filter(transfer -> transfer.getUserFrom().equals(currentUser.getUser().
-                            getUsername())).collect(Collectors.toList());
-                    break;
-                case "3":
-                    filteredTransfers = transfers.stream().filter(transfer -> transfer.getUserTo().equals(currentUser.getUser().
-                            getUsername())).collect(Collectors.toList());
-                    break;
-            }
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
 
         out.printSpace();
-        for (Transfer transfer : filteredTransfers) {
+        for (Transfer transfer : transfers) {
             out.printTransfer(transfer);
         }
 
-        if (filteredTransfers.size() == 0) {
+        if (transfers.size() == 0) {
             out.printNoPendingRequests();
         }
     }
@@ -144,8 +161,21 @@ public class AccountService {
         List<User> allUsers = getAllUsers(currentUser);
         out.printUsers(allUsers, currentUser);
         String userTo = in.getResponse("Who would you like to transfer this to? Please type in their username (case-sensitive): ");
+        if (userTo.equals(currentUser.getUser().getUsername())) {
+            out.printSendMoneyToSelfMessage();
+            return;
+        }
         transfer.setUserTo(userTo);
         String amount = in.getResponse("How much money would you like to send? ");
+        if (!Validation.amountIsPositive(amount)) {
+            out.printNegativeAmountMessage();
+            return;
+        }
+        BigDecimal numericAmount = new BigDecimal(amount);
+        if (!Validation.amountNotMoreThanBalance(viewCurrentBalance(currentUser), numericAmount)) {
+            out.printInsufficientFundsMessage();
+            return;
+        }
         transfer.setAmount(new BigDecimal(amount));
         try {
             String url = baseUrl + "transfers";
@@ -173,8 +203,16 @@ public class AccountService {
             List<User> allUsers = getAllUsers(currentUser);
             out.printUsers(allUsers, currentUser);
             String userFrom = in.getResponse("Who would you like to request money from? Please type in their username (case-sensitive): ");
+            if (userFrom.equals(currentUser.getUser().getUsername())) {
+                out.printSendMoneyToSelfMessage();
+                return;
+            }
             transfer.setUserFrom(userFrom);
             String amount = in.getResponse("How much money would you like to request? ");
+            if (!Validation.amountIsPositive(amount)) {
+                out.printNegativeAmountMessage();
+                return;
+            }
             transfer.setAmount(new BigDecimal(amount));
             String url = baseUrl + "transfers";
             HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
@@ -204,6 +242,11 @@ public class AccountService {
             switch (transferStatusNumber) {
                 case "1":
                     transferStatus = "Approved";
+                    BigDecimal transferAmount = viewSpecificTransfer(currentUser, transferId).getAmount();
+                    if (!Validation.amountNotMoreThanBalance(viewCurrentBalance(currentUser), transferAmount)) {
+                        out.printInsufficientFundsMessage();
+                        return;
+                    }
                     break;
                 case "2":
                     transferStatus = "Rejected";

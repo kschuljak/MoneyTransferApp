@@ -56,6 +56,62 @@ public class JdbcTransferDao implements TransferDao {
     }
 
     @Override
+    public Transfer getSpecificTransfer(String username, int transferId) {
+        String sqlQuery = "SELECT transfer_id, transfer_type_desc, transfer_status_desc, user_from.username AS user_from, user_to.username AS user_to, amount\n" +
+                "FROM transfer\n" +
+                "JOIN transfer_type ON transfer.transfer_type_id = transfer_type.transfer_type_id\n" +
+                "JOIN transfer_status ON transfer.transfer_status_id = transfer_status.transfer_status_id\n" +
+                "JOIN account AS account_from ON account_id = account_from\n" +
+                "JOIN account AS account_to ON account_to.account_id = account_to\n" +
+                "JOIN tenmo_user AS user_from ON account_from.user_id = user_from.user_id\n" +
+                "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id\n" +
+                "WHERE transfer_id = ? AND (user_from.username = ? OR user_to.username = ?);";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlQuery, transferId, username, username);
+        while (results.next()) {
+            return mapRowToTransfer(results);
+        }
+        return null;
+    }
+
+    @Override
+    public List<Transfer> getPendingTransfersSentToUser(String username) {
+        List<Transfer> transfers = new ArrayList<>();
+        String sqlQuery = "SELECT transfer_id, transfer_type_desc, transfer_status_desc, user_from.username AS user_from, user_to.username AS user_to, amount\n" +
+                "FROM transfer\n" +
+                "JOIN transfer_type ON transfer.transfer_type_id = transfer_type.transfer_type_id\n" +
+                "JOIN transfer_status ON transfer.transfer_status_id = transfer_status.transfer_status_id\n" +
+                "JOIN account AS account_from ON account_id = account_from\n" +
+                "JOIN account AS account_to ON account_to.account_id = account_to\n" +
+                "JOIN tenmo_user AS user_from ON account_from.user_id = user_from.user_id\n" +
+                "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id\n" +
+                "WHERE transfer_status_desc = 'Pending' AND user_from.username = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlQuery, username);
+        while (results.next()) {
+            transfers.add(mapRowToTransfer(results));
+        }
+        return transfers;
+    }
+
+    @Override
+    public List<Transfer> getPendingTransfersSentByUser(String username) {
+        List<Transfer> transfers = new ArrayList<>();
+        String sqlQuery = "SELECT transfer_id, transfer_type_desc, transfer_status_desc, user_from.username AS user_from, user_to.username AS user_to, amount\n" +
+                "FROM transfer\n" +
+                "JOIN transfer_type ON transfer.transfer_type_id = transfer_type.transfer_type_id\n" +
+                "JOIN transfer_status ON transfer.transfer_status_id = transfer_status.transfer_status_id\n" +
+                "JOIN account AS account_from ON account_id = account_from\n" +
+                "JOIN account AS account_to ON account_to.account_id = account_to\n" +
+                "JOIN tenmo_user AS user_from ON account_from.user_id = user_from.user_id\n" +
+                "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id\n" +
+                "WHERE transfer_status_desc = 'Pending' AND user_to.username = ?;";
+        SqlRowSet results = jdbcTemplate.queryForRowSet(sqlQuery, username);
+        while (results.next()) {
+            transfers.add(mapRowToTransfer(results));
+        }
+        return transfers;
+    }
+
+    @Override
     public boolean createTransfer(Transfer transfer) {
         String sqlQuery = "INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount)\n" +
                 "VALUES (\n" +
@@ -83,13 +139,14 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public void updateTransferStatus(String username, int transferId, String newTransferStatus) {
-        String sqlQuery = "UPDATE transfer\n" +
-                "SET transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = ?)\n" +
-                "WHERE transfer_id = ? AND account_from =\n" +
-                "\t(SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE username = ?);";
-        jdbcTemplate.update(sqlQuery, newTransferStatus, transferId, username);
-        if (newTransferStatus.equals("Approved")) {
-            sqlQuery = "SELECT transfer_id, transfer_type_desc, transfer_status_desc, user_from.username AS user_from, user_to.username AS user_to, amount\n" +
+        if (newTransferStatus.equals("Rejected")) {
+            String sqlQuery = "UPDATE transfer\n" +
+                    "SET transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = ?)\n" +
+                    "WHERE transfer_id = ? AND account_from =\n" +
+                    "\t(SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE username = ?);";
+            jdbcTemplate.update(sqlQuery, newTransferStatus, transferId, username);
+        } else if (newTransferStatus.equals("Approved")) {
+            String sqlQuery = "SELECT transfer_id, transfer_type_desc, transfer_status_desc, user_from.username AS user_from, user_to.username AS user_to, amount\n" +
                     "FROM transfer\n" +
                     "JOIN transfer_type ON transfer.transfer_type_id = transfer_type.transfer_type_id\n" +
                     "JOIN transfer_status ON transfer.transfer_status_id = transfer_status.transfer_status_id\n" +
@@ -124,8 +181,12 @@ public class JdbcTransferDao implements TransferDao {
             "UPDATE account SET balance = balance - ? WHERE account_id =\n" +
             "\t(SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id\n" +
             "\t WHERE username = ?);\n" +
+            "UPDATE transfer\n" +
+            "SET transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE transfer_status_desc = ?)\n" +
+            "WHERE transfer_id = ? AND account_from =\n" +
+            "\t(SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE username = ?);" +
             "COMMIT;";
-        jdbcTemplate.update(sqlQuery, amount, userTo, amount, userFrom);
+        jdbcTemplate.update(sqlQuery, amount, userTo, amount, userFrom, "Approved", transferId, userFrom);
         return true;
     }
 

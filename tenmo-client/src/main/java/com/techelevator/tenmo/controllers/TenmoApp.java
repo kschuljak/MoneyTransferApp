@@ -105,6 +105,9 @@ public class TenmoApp
             {
                 accountService.updateTransfer(currentUser);
             }
+            else if (menuSelection == 7) {
+                accountService.viewSpecificTransfer(currentUser);
+            }
             else if (menuSelection == 0)
             {
                 continue;

@@ -56,6 +56,7 @@ public class UserOutput
         System.out.println("4: Send TE bucks");
         System.out.println("5: Request TE bucks");
         System.out.println("6: Approve or reject transfer requests");
+        System.out.println("7: View a specific transfer (please have transferID ready)");
         System.out.println("0: Exit");
         System.out.println();
     }
@@ -147,5 +148,20 @@ public class UserOutput
     public void printNoPendingRequests() {
         System.out.println();
         System.out.println("You have no pending requests of this type.");
+    }
+
+    public void printSendMoneyToSelfMessage() {
+        System.out.println();
+        System.out.println("You cannot send money to yourself.");
+    }
+
+    public void printInsufficientFundsMessage() {
+        System.out.println();
+        System.out.println("Insufficient funds.");
+    }
+
+    public void printNegativeAmountMessage() {
+        System.out.println();
+        System.out.println("You cannot send or request a non-positive amount of money.");
     }
 }
