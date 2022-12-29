@@ -88,7 +88,7 @@ public class AccountService {
         for (Transfer transfer : transfers) {
             out.printTransfer(transfer);
         }
-        out.printMessage("");
+        out.printSpace();
     }
 
     public void viewPendingRequests(AuthenticatedUser currentUser) // require user authentication
@@ -120,13 +120,13 @@ public class AccountService {
             BasicLogger.log(e.getMessage());
         }
 
-        out.printMessage("");
+        out.printSpace();
         for (Transfer transfer : filteredTransfers) {
             out.printTransfer(transfer);
         }
 
         if (filteredTransfers.size() == 0) {
-
+            out.printNoPendingRequests();
         }
     }
 
@@ -193,8 +193,10 @@ public class AccountService {
         // if rejected, no change to accounts
         try {
             viewPendingRequests(currentUser);
+            out.printSpace();
             Transfer transfer = new Transfer();
             String transferId = in.getResponse("Which transfer would you like to update? ");
+            out.printSpace();
             transfer.setTransferId(Integer.parseInt(transferId));
             String url = baseUrl + "transfers/" + transferId + "/";
             String transferStatusNumber = in.getResponse("Would you like to approve or reject?\n1: Approve\n2: Reject\n\nPlease choose an option: ");
