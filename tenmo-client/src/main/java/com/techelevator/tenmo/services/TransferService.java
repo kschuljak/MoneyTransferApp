@@ -7,7 +7,6 @@ import com.techelevator.tenmo.views.UserInput;
 import com.techelevator.tenmo.views.UserOutput;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
@@ -23,11 +22,15 @@ public class TransferService {
     protected final RestTemplate restTemplate = new RestTemplate();
     private UserInput in = new UserInput();
     private UserOutput out = new UserOutput();
+
+    private UserService userService;
     private AccountService accountService;
+    private EntityService entityService = new EntityService();
 
     public TransferService(String baseUrl) {
         this.baseUrl = baseUrl;
         accountService = new AccountService(baseUrl);
+        userService = new UserService(baseUrl);
     }
 
 
@@ -39,7 +42,7 @@ public class TransferService {
         List<Transfer> transfers = new ArrayList<>();
         try {
             String url = baseUrl + "transfers";
-            HttpEntity<Void> entity = constructBlankEntity(currentUser);
+            HttpEntity<Void> entity = entityService.constructBlankEntity(currentUser);
             ResponseEntity<Transfer[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer[].class);
             transfers = Arrays.asList(response.getBody());
         } catch (Exception e) {
@@ -58,7 +61,7 @@ public class TransferService {
     public Transfer viewSpecificTransfer(AuthenticatedUser currentUser, String transferId) {
         try {
             String url = baseUrl + "transfers/" + transferId + "/";
-            HttpEntity<Void> entity = constructBlankEntity(currentUser);
+            HttpEntity<Void> entity = entityService.constructBlankEntity(currentUser);
             ResponseEntity<Transfer> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer.class);
             return response.getBody();
         } catch (Exception e) {
@@ -87,7 +90,7 @@ public class TransferService {
                     url += "&sentby=user";
                     break;
             }
-            HttpEntity<Void> entity = constructBlankEntity(currentUser);
+            HttpEntity<Void> entity = entityService.constructBlankEntity(currentUser);
             ResponseEntity<Transfer[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer[].class);
             transfers = Arrays.asList(response.getBody());
         } catch (Exception e) {
@@ -106,7 +109,7 @@ public class TransferService {
         List<Transfer> transfers = new ArrayList<>();
         try {
             String url = baseUrl + "transfers?status=pending&sentto=user";
-            HttpEntity<Void> entity = constructBlankEntity(currentUser);
+            HttpEntity<Void> entity = entityService.constructBlankEntity(currentUser);
             ResponseEntity<Transfer[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer[].class);
             transfers = Arrays.asList(response.getBody());
         } catch (Exception e) {
@@ -131,7 +134,7 @@ public class TransferService {
         Transfer transfer = new Transfer();
         transfer.setTransferType("Send");
         transfer.setUserFrom(currentUser.getUser().getUsername());
-        List<User> allUsers = accountService.getAllUsers(currentUser);
+        List<User> allUsers = userService.getAllUsers(currentUser);
         out.printUsers(allUsers, currentUser);
         String userTo = in.getResponse("Who would you like to transfer this to? Please type in their username (case-sensitive): ");
         if (userTo.equals(currentUser.getUser().getUsername())) {
@@ -160,7 +163,7 @@ public class TransferService {
         }
         try {
             String url = baseUrl + "transfers";
-            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
+            HttpEntity<Transfer> entity = entityService.constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
             accountService.viewCurrentBalance(currentUser);
         } catch (Exception e) {
@@ -182,7 +185,7 @@ public class TransferService {
             Transfer transfer = new Transfer();
             transfer.setTransferType("Request");
             transfer.setUserTo(currentUser.getUser().getUsername());
-            List<User> allUsers = accountService.getAllUsers(currentUser);
+            List<User> allUsers = userService.getAllUsers(currentUser);
             out.printUsers(allUsers, currentUser);
             String userFrom = in.getResponse("Who would you like to request money from? Please type in their username (case-sensitive): ");
             if (userFrom.equals(currentUser.getUser().getUsername())) {
@@ -206,7 +209,7 @@ public class TransferService {
             }
             transfer.setAmount(amount);
             String url = baseUrl + "transfers";
-            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
+            HttpEntity<Transfer> entity = entityService.constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.POST, entity, Void.class);
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
@@ -251,25 +254,11 @@ public class TransferService {
                     break;
             }
             transfer.setTransferStatus(transferStatus);
-            HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
+            HttpEntity<Transfer> entity = entityService.constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
             accountService.viewCurrentBalance(currentUser);
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
-    }
-
-    private HttpEntity<Void> constructBlankEntity(AuthenticatedUser currentUser) {
-        HttpHeaders headers = new HttpHeaders();
-        var jwt = currentUser.getToken();
-        headers.setBearerAuth(jwt);
-        return new HttpEntity<>(headers);
-    }
-
-    private HttpEntity<Transfer> constructTransferEntity(AuthenticatedUser currentUser, Transfer transfer) {
-        HttpHeaders headers = new HttpHeaders();
-        var jwt = currentUser.getToken();
-        headers.setBearerAuth(jwt);
-        return new HttpEntity<>(transfer, headers);
     }
 }
