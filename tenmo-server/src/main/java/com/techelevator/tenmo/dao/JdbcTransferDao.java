@@ -95,8 +95,10 @@ public class JdbcTransferDao implements TransferDao {
                     "JOIN tenmo_user AS user_to ON account_to.user_id = user_to.user_id\n" +
                     "WHERE transfer_id = ?;";
             SqlRowSet results = jdbcTemplate.queryForRowSet(sqlQuery, transferId);
-            Transfer transfer = mapRowToTransfer(results);
-            sendTransfer(transfer);
+            while (results.next()) {
+                Transfer transfer = mapRowToTransfer(results);
+                sendTransfer(transfer);
+            }
         }
     }
 
@@ -105,17 +107,21 @@ public class JdbcTransferDao implements TransferDao {
         // account_from (money out), account_to (money in)
         // TODO (maybe?) add in validation for transaction completion
         int transferId = transfer.getTransferId();
-        String accountFrom = transfer.getUserFrom();
-        String accountTo = transfer.getUserTo();
+        String userFrom = transfer.getUserFrom();
+        String userTo = transfer.getUserTo();
         BigDecimal amount = transfer.getAmount();
 //        if (!isValidTransfer(transfer)) {
 //            return false;
 //        }
-        String sqlQuery = "BEGIN TRANSACTION " +
-                "UPDATE account SET balance = (balance + ?) WHERE account_id = ?; " +
-                "UPDATE account SET balance = (balance - ?) WHERE account_id = ?; " +
-                "COMMIT;";
-        jdbcTemplate.update(sqlQuery, amount, accountTo, amount, accountFrom);
+        String sqlQuery = "BEGIN TRANSACTION;\n" +
+            "UPDATE account SET balance = balance + ? WHERE account_id =\n" +
+            "\t(SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id\n" +
+            "\t WHERE username = ?);\n" +
+            "UPDATE account SET balance = balance - ? WHERE account_id =\n" +
+            "\t(SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id\n" +
+            "\t WHERE username = ?);\n" +
+            "COMMIT;";
+        jdbcTemplate.update(sqlQuery, amount, userTo, amount, userFrom);
         return true;
     }
 
