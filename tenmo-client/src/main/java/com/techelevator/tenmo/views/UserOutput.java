@@ -1,10 +1,13 @@
 package com.techelevator.tenmo.views;
 
 
+import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
+import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.models.UserCredentials;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Scanner;
 
 public class UserOutput
@@ -24,6 +27,7 @@ public class UserOutput
         {
             menuSelection = -1;
         }
+        System.out.println();
         return menuSelection;
     }
 
@@ -112,6 +116,16 @@ public class UserOutput
         System.out.println("An error occurred. Check the log for details.");
     }
 
+    public void printUsers(List<User> allUsers, AuthenticatedUser currentUser) {
+        System.out.println("***Users***");
+        for (User user : allUsers) {
+            if (!user.getUsername().equals(currentUser.getUser().getUsername())) {
+                System.out.println(user.getUsername());
+            }
+        }
+        System.out.println();
+    }
+
     public void printTransfer(Transfer transfer) {
         System.out.print("Transfer id: " + transfer.getTransferId() + " | ");
         System.out.print("Transfer type: " + transfer.getTransferType() + " | ");
@@ -122,4 +136,12 @@ public class UserOutput
         System.out.println();
     }
 
+    public void printMessage(String message) {
+        System.out.println(message);
+    }
+
+    public void printNoPendingRequests() {
+        System.out.println("");
+        System.out.println("You have no pending requests of this type.");
+    }
 }

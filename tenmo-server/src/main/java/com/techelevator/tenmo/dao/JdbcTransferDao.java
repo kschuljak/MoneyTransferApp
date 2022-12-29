@@ -74,6 +74,10 @@ public class JdbcTransferDao implements TransferDao {
         if (transferId == null) {
             return false;
         }
+        if (transfer.getTransferType().equals("Send")) {
+            transfer.setTransferId(transferId);
+            return sendTransfer(transfer);
+        }
         return true;
     }
 

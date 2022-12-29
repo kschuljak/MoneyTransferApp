@@ -88,6 +88,7 @@ public class AccountService {
         for (Transfer transfer : transfers) {
             out.printTransfer(transfer);
         }
+        out.printMessage("");
     }
 
     public void viewPendingRequests(AuthenticatedUser currentUser) // require user authentication
@@ -101,7 +102,7 @@ public class AccountService {
             ResponseEntity<Transfer[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Transfer[].class);
             transfers = Arrays.asList(response.getBody());
             String pendingRequestsChoice = in.getResponse("Would you like to:\n1: View all pending requests\n2: " +
-                    "View received and pending requests\n3: View sent and pending requests\n");
+                    "View received and pending requests\n3: View sent and pending requests\n\nPlease choose an option: ");
             switch (pendingRequestsChoice) {
                 case "1":
                     filteredTransfers = transfers;
@@ -119,12 +120,13 @@ public class AccountService {
             BasicLogger.log(e.getMessage());
         }
 
+        out.printMessage("");
         for (Transfer transfer : filteredTransfers) {
             out.printTransfer(transfer);
         }
 
         if (filteredTransfers.size() == 0) {
-            System.out.println("You have no pending requests of this type.");
+
         }
     }
 
@@ -139,6 +141,8 @@ public class AccountService {
         Transfer transfer = new Transfer();
         transfer.setTransferType("Send");
         transfer.setUserFrom(currentUser.getUser().getUsername());
+        List<User> allUsers = getAllUsers(currentUser);
+        out.printUsers(allUsers, currentUser);
         String userTo = in.getResponse("Who would you like to transfer this to? Please type in their username (case-sensitive): ");
         transfer.setUserTo(userTo);
         String amount = in.getResponse("How much money would you like to send? ");
@@ -166,9 +170,11 @@ public class AccountService {
             Transfer transfer = new Transfer();
             transfer.setTransferType("Request");
             transfer.setUserTo(currentUser.getUser().getUsername());
+            List<User> allUsers = getAllUsers(currentUser);
+            out.printUsers(allUsers, currentUser);
             String userFrom = in.getResponse("Who would you like to request money from? Please type in their username (case-sensitive): ");
             transfer.setUserFrom(userFrom);
-            String amount = in.getResponse("How much money would you like to request?");
+            String amount = in.getResponse("How much money would you like to request? ");
             transfer.setAmount(new BigDecimal(amount));
             String url = baseUrl + "transfers";
             HttpEntity<Transfer> entity = constructTransferEntity(currentUser, transfer);
