@@ -3,18 +3,14 @@ package com.techelevator.tenmo.services;
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
-import com.techelevator.tenmo.services.Validation;
 import org.junit.Before;
 import org.junit.Test;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
 import static org.junit.Assert.*;
 
 public class ValidationTest {
-
     @Before
     public void setUp() {
         User user1 = new User();

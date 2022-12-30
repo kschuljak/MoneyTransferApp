@@ -5,6 +5,7 @@ import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.views.Icons;
+import com.techelevator.tenmo.views.UserInput;
 import com.techelevator.tenmo.views.UserOutput;
 import com.techelevator.util.BasicLogger;
 import org.springframework.http.HttpEntity;
@@ -20,9 +21,7 @@ public class TransferService {
     private final RestTemplate restTemplate = new RestTemplate();
     private final UserService userService;
     private final AccountService accountService;
-    private final String CANT_SEND_MONEY_TO_SELF_MESSAGE = "You cannot send money to yourself.";
     private final String INSUFFICIENT_FUNDS_MESSAGE = "Insufficient funds.";
-    private final String INVALID_USERNAME_MESSAGE = "Invalid user.";
     private final String INVALID_TRANSFER_MESSAGE = "Invalid transfer.";
     private final String TRANSFER_BASE_URL = TenmoApp.API_BASE_URL + "transfers";
 
@@ -50,7 +49,7 @@ public class TransferService {
     }
 
     public void viewPendingRequests(AuthenticatedUser currentUser) {
-        int pendingRequestsChoice = UserOutput.promptForMenuSelection("Would you like to:\n1: View all pending " +
+        int pendingRequestsChoice = UserInput.promptForMenuSelection("Would you like to:\n1: View all pending " +
                 "requests\n2: View received and pending requests\n3: View sent and pending requests\n\nPlease choose " +
                 "an option: ");
         String url = TRANSFER_BASE_URL + "?status=pending";
@@ -87,7 +86,7 @@ public class TransferService {
     }
 
     public void viewTransfer(AuthenticatedUser currentUser) {
-        int transferId = UserOutput.promptForMenuSelection("Which transfer would you like to view? ");
+        int transferId = UserInput.promptForMenuSelection("Which transfer would you like to view? ");
         Transfer transfer = getTransfer(currentUser, transferId);
         if (transfer == null) {
             UserOutput.printRed(INVALID_TRANSFER_MESSAGE);
@@ -124,18 +123,13 @@ public class TransferService {
         List<User> allUsers = userService.getAllUsers(currentUser);
         UserOutput.printUsers(allUsers, currentUser);
         UserOutput.printSpace();
-        String userFrom = UserOutput.promptForString("Who would you like to request money from? Please type in their " +
+        String userFrom = UserInput.promptForString("Who would you like to request money from? Please type in their " +
                 "username (case-sensitive): ");
-        if (userFrom.equals(currentUser.getUser().getUsername())) {
-            UserOutput.printRed(CANT_SEND_MONEY_TO_SELF_MESSAGE);
-            return;
-        }
-        if (Validation.isInvalidUser(allUsers, userFrom)) {
-            UserOutput.printRed(INVALID_USERNAME_MESSAGE);
+        if (Validation.isInvalidRecipient(allUsers, userFrom, currentUser)) {
             return;
         }
         transfer.setUserFrom(userFrom);
-        String stringAmount = UserOutput.promptForString("How much money would you like to request? ");
+        String stringAmount = UserInput.promptForString("How much money would you like to request? ");
         BigDecimal amount = Validation.validTransferAmountOrNull(stringAmount);
         if (amount == null) {
             return;
@@ -144,6 +138,8 @@ public class TransferService {
         try {
             HttpEntity<Transfer> entity = EntityService.constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(TRANSFER_BASE_URL, HttpMethod.POST, entity, Void.class);
+            UserOutput.printMessage("You requested $" + UserOutput.DECIMAL_FORMAT.format(amount) + " from " +
+                    userFrom + ".");
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
@@ -159,25 +155,20 @@ public class TransferService {
         If the transfer is valid, it is entered into the database with a status of "Approved", and the amount of the
         transfer is removed from the sender's account and added to the receiver's account.
         */
-        UserOutput.printMessage(Icons.cuteDollarHandingBunny);
+        UserOutput.printMessage(Icons.dollarHandingBunny);
         Transfer transfer = new Transfer();
         transfer.setTransferType("Send");
         transfer.setUserFrom(currentUser.getUser().getUsername());
         List<User> allUsers = userService.getAllUsers(currentUser);
         UserOutput.printUsers(allUsers, currentUser);
         UserOutput.printSpace();
-        String userTo = UserOutput.promptForString("Who would you like to transfer this to? Please type in their " +
+        String userTo = UserInput.promptForString("Who would you like to transfer this to? Please type in their " +
                 "username (case-sensitive): ");
-        if (userTo.equals(currentUser.getUser().getUsername())) {
-            UserOutput.printRed(CANT_SEND_MONEY_TO_SELF_MESSAGE);
-            return;
-        }
-        if (Validation.isInvalidUser(allUsers, userTo)) {
-            UserOutput.printRed(INVALID_USERNAME_MESSAGE);
+        if (Validation.isInvalidRecipient(allUsers, userTo, currentUser)) {
             return;
         }
         transfer.setUserTo(userTo);
-        String stringAmount = UserOutput.promptForString("How much money would you like to send? ");
+        String stringAmount = UserInput.promptForString("How much money would you like to send? ");
         BigDecimal amount = Validation.validTransferAmountOrNull(stringAmount);
         if (amount == null) {
             return;
@@ -190,6 +181,7 @@ public class TransferService {
         try {
             HttpEntity<Transfer> entity = EntityService.constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(TRANSFER_BASE_URL, HttpMethod.POST, entity, Void.class);
+            UserOutput.printMessage("You sent $" + UserOutput.DECIMAL_FORMAT.format(amount) + " to " + userTo + ".");
             accountService.viewCurrentBalance(currentUser);
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
@@ -209,19 +201,19 @@ public class TransferService {
         */
         List<Transfer> transfers = viewPendingRequests(currentUser, TenmoApp.API_BASE_URL + "transfers?status=pending&sentto=user");
         Transfer transfer = new Transfer();
-        int transferId = UserOutput.promptForMenuSelection("Which transfer would you like to update? ");
+        int transferId = UserInput.promptForMenuSelection("Which transfer would you like to update? ");
         if (Validation.isInvalidTransfer(transfers, transferId)) {
             UserOutput.printRed(INVALID_TRANSFER_MESSAGE);
             return;
         }
         transfer.setTransferId(transferId);
         String url = TRANSFER_BASE_URL + "/" + transferId + "/";
-        int transferStatusNumber = UserOutput.promptForMenuSelection("Would you like to approve or reject?\n1: Approve\n" +
+        int transferStatusNumber = UserInput.promptForMenuSelection("Would you like to approve or reject?\n1: Approve\n" +
                 "2: Reject\n\nPlease choose an option: ");
         String transferStatus;
         switch (transferStatusNumber) {
             case 1:
-                UserOutput.printMessage(Icons.cuteDollarHandingBunny);
+                UserOutput.printMessage(Icons.dollarHandingBunny);
                 transferStatus = "Approved";
                 BigDecimal transferAmount = getTransfer(currentUser, transferId).getAmount();
                 if (Validation.amountMoreThanBalance(accountService.getCurrentBalance(currentUser),
@@ -230,8 +222,7 @@ public class TransferService {
                     return;
                 }
                 if (Validation.exceedsTransferLimit(transferAmount)) {
-                    String TRANSFER_EXCEEDS_LIMIT_MESSAGE = "Transfers cannot exceed $99,999.99.";
-                    UserOutput.printRed(TRANSFER_EXCEEDS_LIMIT_MESSAGE);
+                    UserOutput.printRed("Transfers cannot exceed $99,999.99.");
                     return;
                 }
                 break;
@@ -247,7 +238,17 @@ public class TransferService {
         try {
             HttpEntity<Transfer> entity = EntityService.constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(url, HttpMethod.PUT, entity, Void.class);
-            accountService.viewCurrentBalance(currentUser);
+            switch (transferStatus) {
+                case "Approved" :
+                    UserOutput.printMessage("You approved this transfer. $" +
+                            UserOutput.DECIMAL_FORMAT.format(transfer.getAmount()) + " was sent to " +
+                            transfer.getUserTo() + ".");
+                    accountService.viewCurrentBalance(currentUser);
+                    break;
+                case "Rejected":
+                    UserOutput.printMessage("You rejected this transfer.");
+                    break;
+            }
         } catch (Exception e) {
             BasicLogger.log(e.getMessage());
         }
