@@ -1,6 +1,7 @@
 package com.techelevator.tenmo.services;
 
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.services.Validation;
 import org.junit.Before;
@@ -250,21 +251,118 @@ public class ValidationTest {
     }
 
     @Test
-    public void isInvalidTransfer_ReturnsTrue_GivenTransfer_NotSameAsTransferId() {
+    public void isInvalidTransfer_ReturnsTrue_GivenTransferTransferId_NotInTransferList() {
         //arrange
+        Transfer transfer1 = new Transfer();
+        transfer1.setTransferId(1001);
+        Transfer transfer2 = new Transfer();
+        transfer2.setTransferId(002);
+        Transfer transfer3 = new Transfer();
+        transfer3.setTransferId(3);
+        List<Transfer> transfers = new ArrayList<>();
+        transfers.add(transfer1);
+        transfers.add(transfer2);
+        transfers.add(transfer3);
+
+        int transferId1 = 1000;
+        int transferId2 = 0;
+        int transferId3 = 21;
 
         //act
+        boolean actual1 = Validation.isInvalidTransfer(transfers, transferId1);
+        boolean actual2 = Validation.isInvalidTransfer(transfers, transferId2);
+        boolean actual3 = Validation.isInvalidTransfer(transfers, transferId3);
 
         //assert
+        String message1 = "Because transferId (1000) not in list of transfers";
+        assertTrue(message1, actual1);
+        String message2 = "Because transferId (0) not in list of transfers";
+        assertTrue(message2, actual2);
+        String message3 = "Because transferId (21) not in list of transfers";
+        assertTrue(message3, actual3);
     }
 
     @Test
-    public void isInvalidTransfer_ReturnsFalse_GivenTransfer_SameAsTransferId() {
+    public void isInvalidTransfer_ReturnsFalse_GivenTransferTransferId_InTransferList() {
         //arrange
+        Transfer transfer1 = new Transfer();
+        transfer1.setTransferId(1001);
+        Transfer transfer2 = new Transfer();
+        transfer2.setTransferId(002);
+        Transfer transfer3 = new Transfer();
+        transfer3.setTransferId(3);
+        List<Transfer> transfers = new ArrayList<>();
+        transfers.add(transfer1);
+        transfers.add(transfer2);
+        transfers.add(transfer3);
+
+        int transferId1 = 1001;
+        int transferId2 = 2;
+        int transferId3 = 003;
 
         //act
+        boolean actual1 = Validation.isInvalidTransfer(transfers, transferId1);
+        boolean actual2 = Validation.isInvalidTransfer(transfers, transferId2);
+        boolean actual3 = Validation.isInvalidTransfer(transfers, transferId3);
 
         //assert
+        String message1 = "Because transferId (1001) found in list of transfers";
+        assertFalse(message1, actual1);
+        String message2 = "Because transferId (2) found in list of transfers";
+        assertFalse(message2, actual2);
+        String message3 = "Because transferId (003) found in list of transfers";
+        assertFalse(message3, actual3);
+    }
+
+    @Test
+    public void validTransferAmountOrNull_ReturnsTransferAmount_GivenValidTransfer() {
+        //arrange
+        String amount1 = "4000";
+        String amount2 = "0.01";
+        String amount3 = "99999.99";
+
+        BigDecimal expected1 = new BigDecimal("4000");
+        BigDecimal expected2 = new BigDecimal("0.01");
+        BigDecimal expected3 = new BigDecimal("99999.99");
+
+        //act
+        BigDecimal actual1 = Validation.validTransferAmountOrNull(amount1);
+        BigDecimal actual2 = Validation.validTransferAmountOrNull(amount2);
+        BigDecimal actual3 = Validation.validTransferAmountOrNull(amount3);
+
+        //assert
+        String message1 = "Because amount (4000) is valid (greater than zero and less than transfer limit)";
+        assertEquals(message1, expected1, actual1);
+        String message2 = "Because amount (0.01) is valid (greater than zero and less than transfer limit)";
+        assertEquals(message2, expected2, actual2);
+        String message3 = "Because amount (99999.99) is valid (greater than zero and less than transfer limit)";
+        assertEquals(message3, expected3, actual3);
+    }
+
+    @Test
+    public void validTransferAmountOrNull_ReturnsNull_GivenInvalidTransfer() {
+        //arrange
+        String amount1 = "-4000";
+        String amount2 = "0.00";
+        String amount3 = "100000.00";
+        String amount4 = "hello";
+
+        //act
+        Object actual1 = Validation.validTransferAmountOrNull(amount1);
+        Object actual2 = Validation.validTransferAmountOrNull(amount2);
+        Object actual3 = Validation.validTransferAmountOrNull(amount3);
+        Object actual4 = Validation.validTransferAmountOrNull(amount4);
+
+
+        //assert
+        String message1 = "Because amount (-4000) is not valid (not greater than zero)";
+        assertNull(message1, actual1);
+        String message2 = "Because amount (0) is not valid (not greater than zero)";
+        assertNull(message2, actual2);
+        String message3 = "Because amount (100,000) is not valid (not less than transfer limit)";
+        assertNull(message3, actual3);
+        String message4 = "Because amount (hello) is not valid (not a number - cannot convert into BigDecimal)";
+        assertNull(message4, actual4);
     }
 
 }

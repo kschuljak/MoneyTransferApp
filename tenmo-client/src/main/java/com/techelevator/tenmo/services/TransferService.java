@@ -201,11 +201,11 @@ public class TransferService {
         Obtains user input on what transfer to update and whether to approve or reject it.
         If rejected, the transfer's status is changed in the database to "Rejected".
         If approved, the transfer's status is changed in the database to "Approved", and the amount of the transfer is
-        removed from the user's account and sent to the requester's account.
+        removed from the user's account and sent to the requesters account.
         If the transfer ID input is not the ID of a pending transfer which had been sent to the current user, the user
         is informed that they made an invalid choice and returned to the home screen.
         Likewise, if the user inputs something invalid when prompted to approve or reject the transfer, they are
-        informed that they made an inavlid choice and returned to the home screen.
+        informed that they made an invalid choice and returned to the home screen.
         */
         List<Transfer> transfers = viewPendingRequests(currentUser, TenmoApp.API_BASE_URL + "transfers?status=pending&sentto=user");
         Transfer transfer = new Transfer();
