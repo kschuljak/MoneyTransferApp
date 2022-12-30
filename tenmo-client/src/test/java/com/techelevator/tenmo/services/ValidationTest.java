@@ -317,7 +317,7 @@ public class ValidationTest {
         String amount2 = "0.01";
         String amount3 = "99999.99";
 
-        BigDecimal expected1 = new BigDecimal("4000");
+        BigDecimal expected1 = new BigDecimal("4000.00");
         BigDecimal expected2 = new BigDecimal("0.01");
         BigDecimal expected3 = new BigDecimal("99999.99");
 
@@ -327,7 +327,7 @@ public class ValidationTest {
         BigDecimal actual3 = Validation.validTransferAmountOrNull(amount3);
 
         //assert
-        String message1 = "Because amount (4000) is valid (greater than zero and less than transfer limit)";
+        String message1 = "Because amount (4000.00) is valid (greater than zero and less than transfer limit)";
         assertEquals(message1, expected1, actual1);
         String message2 = "Because amount (0.01) is valid (greater than zero and less than transfer limit)";
         assertEquals(message2, expected2, actual2);
