@@ -11,6 +11,7 @@ import java.util.List;
 
 @Component
 public class JdbcTransferDao implements TransferDao {
+
     private final JdbcTemplate jdbcTemplate;
 
     public JdbcTransferDao(JdbcTemplate jdbcTemplate) {

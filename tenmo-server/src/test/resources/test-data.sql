@@ -75,4 +75,29 @@ INSERT INTO tenmo_user (username,password_hash,role) VALUES ('user1','user1','RO
 INSERT INTO tenmo_user (username,password_hash,role) VALUES ('user2','user2','ROLE_USER'); -- 1002
 INSERT INTO tenmo_user (username,password_hash,role) VALUES ('user3','user3','ROLE_USER');
 
+-- account1 - user1, $2500
+INSERT INTO account (user_id, balance) VALUES (1001, 2500);
+
+-- account2 - user2, $5
+INSERT INTO account (user_id, balance) VALUES (1002, 5);
+
+-- account3 - user3, $680
+INSERT INTO account (user_id, balance) VALUES (1003, 680);
+
+-- transfer1 - request, pending, account1 (user1), account3(user3), $5
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount)
+VALUES (1, 1, 2001, 2003, 5);
+
+-- transfer2 - request, pending, account1 (user1), account2(user2), $10
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount)
+VALUES (1, 1, 2001, 2002, 10);
+
+-- transfer3 - send, approved, account1 (user1), account3(user3), $20
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount)
+VALUES (2, 2, 2001, 2003, 20);
+
+-- transfer4 - request, pending, account3 (user3), account2(user2), $2
+INSERT INTO transfer (transfer_type_id, transfer_status_id, account_from, account_to, amount)
+VALUES (1, 1, 2003, 2002, 2);
+
 COMMIT TRANSACTION;
