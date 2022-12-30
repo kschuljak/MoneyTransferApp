@@ -1,10 +1,9 @@
 package com.techelevator.tenmo.services;
 
-import com.techelevator.tenmo.models.Account;
 import com.techelevator.tenmo.models.AuthenticatedUser;
+import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Validation {
@@ -23,19 +22,29 @@ public class Validation {
         return value > 0;
     }
 
-    public static boolean amountNotMoreThanBalance(BigDecimal accountBalance, BigDecimal amountToTransfer){
-        return (accountBalance.compareTo(amountToTransfer) >= 0);
+    public static boolean amountMoreThanBalance(BigDecimal accountBalance, BigDecimal amountToTransfer){
+        return (accountBalance.compareTo(amountToTransfer) < 0);
     }
 
     public static boolean exceedsTransferLimit(BigDecimal amountToTransfer){
         return (amountToTransfer.compareTo(TRANSFER_LIMIT) > 0);
     }
 
-    public static boolean isValidUser(List<User> users, String givenUsername) {
-        List<String> usernames = new ArrayList<>();
+    public static boolean isInvalidUser(List<User> users, String givenUsername) {
         for (User user : users) {
-            usernames.add(user.getUsername());
+            if (user.getUsername().equals(givenUsername)) {
+                return false;
+            }
         }
-        return usernames.contains(givenUsername);
+        return true;
+    }
+
+    public static boolean isInvalidTransfer(List<Transfer> transfers, int transferId) {
+        for (Transfer transfer : transfers) {
+            if (transfer.getTransferId() == transferId) {
+                return false;
+            }
+        }
+        return true;
     }
 }
