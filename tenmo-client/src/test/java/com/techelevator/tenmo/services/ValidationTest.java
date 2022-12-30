@@ -265,9 +265,9 @@ public class ValidationTest {
         int transferId3 = 21;
 
         //act
-        boolean actual1 = Validation.isInvalidTransfer(transfers, transferId1);
-        boolean actual2 = Validation.isInvalidTransfer(transfers, transferId2);
-        boolean actual3 = Validation.isInvalidTransfer(transfers, transferId3);
+        boolean actual1 = Validation.isInvalidTransferId(transfers, transferId1);
+        boolean actual2 = Validation.isInvalidTransferId(transfers, transferId2);
+        boolean actual3 = Validation.isInvalidTransferId(transfers, transferId3);
 
         //assert
         String message1 = "Because transferId (1000) not in list of transfers";
@@ -297,9 +297,9 @@ public class ValidationTest {
         int transferId3 = 003;
 
         //act
-        boolean actual1 = Validation.isInvalidTransfer(transfers, transferId1);
-        boolean actual2 = Validation.isInvalidTransfer(transfers, transferId2);
-        boolean actual3 = Validation.isInvalidTransfer(transfers, transferId3);
+        boolean actual1 = Validation.isInvalidTransferId(transfers, transferId1);
+        boolean actual2 = Validation.isInvalidTransferId(transfers, transferId2);
+        boolean actual3 = Validation.isInvalidTransferId(transfers, transferId3);
 
         //assert
         String message1 = "Because transferId (1001) found in list of transfers";
@@ -327,7 +327,7 @@ public class ValidationTest {
         BigDecimal actual3 = Validation.validTransferAmountOrNull(amount3);
 
         //assert
-        String message1 = "Because amount (4000) is valid (greater than zero and less than transfer limit)";
+        String message1 = "Because amount (4000.00) is valid (greater than zero and less than transfer limit)";
         assertEquals(message1, expected1, actual1);
         String message2 = "Because amount (0.01) is valid (greater than zero and less than transfer limit)";
         assertEquals(message2, expected2, actual2);

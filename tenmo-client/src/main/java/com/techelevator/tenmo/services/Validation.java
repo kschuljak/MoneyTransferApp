@@ -46,7 +46,7 @@ public class Validation {
         return true;
     }
 
-    public static boolean isInvalidTransfer(List<Transfer> transfers, int transferId) {
+    public static boolean isInvalidTransferId(List<Transfer> transfers, int transferId) {
         for (Transfer transfer : transfers) {
             if (transfer.getTransferId() == transferId) {
                 return false;
