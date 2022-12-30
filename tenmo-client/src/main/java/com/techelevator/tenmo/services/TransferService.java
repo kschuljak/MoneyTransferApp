@@ -202,7 +202,7 @@ public class TransferService {
         List<Transfer> transfers = viewPendingRequests(currentUser, TenmoApp.API_BASE_URL + "transfers?status=pending&sentto=user");
         Transfer transfer = new Transfer();
         int transferId = UserInput.promptForMenuSelection("Which transfer would you like to update? ");
-        if (Validation.isInvalidTransfer(transfers, transferId)) {
+        if (Validation.isInvalidTransferId(transfers, transferId)) {
             UserOutput.printRed(INVALID_TRANSFER_MESSAGE);
             return;
         }

@@ -265,9 +265,9 @@ public class ValidationTest {
         int transferId3 = 21;
 
         //act
-        boolean actual1 = Validation.isInvalidTransfer(transfers, transferId1);
-        boolean actual2 = Validation.isInvalidTransfer(transfers, transferId2);
-        boolean actual3 = Validation.isInvalidTransfer(transfers, transferId3);
+        boolean actual1 = Validation.isInvalidTransferId(transfers, transferId1);
+        boolean actual2 = Validation.isInvalidTransferId(transfers, transferId2);
+        boolean actual3 = Validation.isInvalidTransferId(transfers, transferId3);
 
         //assert
         String message1 = "Because transferId (1000) not in list of transfers";
@@ -297,9 +297,9 @@ public class ValidationTest {
         int transferId3 = 003;
 
         //act
-        boolean actual1 = Validation.isInvalidTransfer(transfers, transferId1);
-        boolean actual2 = Validation.isInvalidTransfer(transfers, transferId2);
-        boolean actual3 = Validation.isInvalidTransfer(transfers, transferId3);
+        boolean actual1 = Validation.isInvalidTransferId(transfers, transferId1);
+        boolean actual2 = Validation.isInvalidTransferId(transfers, transferId2);
+        boolean actual3 = Validation.isInvalidTransferId(transfers, transferId3);
 
         //assert
         String message1 = "Because transferId (1001) found in list of transfers";
