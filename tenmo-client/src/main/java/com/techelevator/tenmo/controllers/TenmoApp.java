@@ -65,11 +65,11 @@ public class TenmoApp {
             if (menuSelection == 1) {
                 accountService.viewCurrentBalance(currentUser);
             } else if (menuSelection == 2) {
-                transferService.viewTransferHistory(currentUser);
+                transferService.viewTransfers(currentUser);
             } else if (menuSelection == 3) {
                 transferService.viewPendingRequests(currentUser);
             } else if (menuSelection == 4) {
-                transferService.viewSpecificTransfer(currentUser);
+                transferService.viewTransfer(currentUser);
             } else if (menuSelection == 5) {
                 transferService.requestBucks(currentUser);
             } else if (menuSelection == 6) {
