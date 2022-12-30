@@ -22,10 +22,10 @@ public class TransferController {
     public List<Transfer> getAllTransfers(Principal principal, @RequestParam(required = false) String status, @RequestParam(required = false) String sentby, @RequestParam(required = false) String sentto) {
         String username = principal.getName();
         if (status == null) {
-            return transferDao.getAllTransfersByUsername(username);
+            return transferDao.getTransfersByUsername(username);
         } else {
             if (sentby == null && sentto == null) {
-                return transferDao.getAllPendingTransfersByUsername(username);
+                return transferDao.getPendingTransfersByUsername(username);
             } else if (sentby == null) {
                 return transferDao.getPendingTransfersSentToUser(username);
             } else if (sentto == null) {
@@ -57,6 +57,6 @@ public class TransferController {
     public Transfer viewSpecificTransfer(Principal principal, @PathVariable String transferId) {
         int transferIdNumeric = Integer.parseInt(transferId);
         String username = principal.getName();
-        return transferDao.getSpecificTransfer(username, transferIdNumeric);
+        return transferDao.getTransferByTransferId(username, transferIdNumeric);
     }
 }

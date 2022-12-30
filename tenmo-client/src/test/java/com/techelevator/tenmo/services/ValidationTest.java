@@ -317,7 +317,7 @@ public class ValidationTest {
         String amount2 = "0.01";
         String amount3 = "99999.99";
 
-        BigDecimal expected1 = new BigDecimal("4000");
+        BigDecimal expected1 = new BigDecimal("4000.00");
         BigDecimal expected2 = new BigDecimal("0.01");
         BigDecimal expected3 = new BigDecimal("99999.99");
 
