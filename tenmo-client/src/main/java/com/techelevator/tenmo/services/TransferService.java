@@ -22,9 +22,7 @@ public class TransferService {
     private final AccountService accountService;
     private final String CANT_SEND_MONEY_TO_SELF_MESSAGE = "You cannot send money to yourself.";
     private final String INSUFFICIENT_FUNDS_MESSAGE = "Insufficient funds.";
-    private final String TRANSFER_IS_NOT_POSITIVE_MESSAGE = "You cannot send or request a non-positive amount of money.";
-    private final String TRANSFER_EXCEEDS_LIMIT_MESSAGE = "Transfers cannot exceed $99,999.99.";
-    private final String INVALID_USERNAME_MESSAGE = "That is not a valid user.";
+    private final String INVALID_USERNAME_MESSAGE = "Invalid user.";
     private final String INVALID_TRANSFER_MESSAGE = "Invalid transfer.";
     private final String TRANSFER_BASE_URL = TenmoApp.API_BASE_URL + "transfers";
 
@@ -33,7 +31,7 @@ public class TransferService {
         userService = new UserService();
     }
 
-    public void viewTransferHistory(AuthenticatedUser currentUser) {
+    public void viewTransfers(AuthenticatedUser currentUser) {
         List<Transfer> transfers = new ArrayList<>();
         try {
             HttpEntity<Void> entity = EntityService.constructBlankEntity(currentUser);
@@ -88,9 +86,9 @@ public class TransferService {
         return transfers;
     }
 
-    public void viewSpecificTransfer(AuthenticatedUser currentUser) {
+    public void viewTransfer(AuthenticatedUser currentUser) {
         int transferId = UserOutput.promptForMenuSelection("Which transfer would you like to view? ");
-        Transfer transfer = getSpecificTransfer(currentUser, transferId);
+        Transfer transfer = getTransfer(currentUser, transferId);
         if (transfer == null) {
             UserOutput.printRed(INVALID_TRANSFER_MESSAGE);
         } else {
@@ -98,7 +96,7 @@ public class TransferService {
         }
     }
 
-    public Transfer getSpecificTransfer(AuthenticatedUser currentUser, int transferId) {
+    public Transfer getTransfer(AuthenticatedUser currentUser, int transferId) {
         String url = TRANSFER_BASE_URL + "/" + transferId + "/";
         try {
             HttpEntity<Void> entity = EntityService.constructBlankEntity(currentUser);
@@ -138,19 +136,8 @@ public class TransferService {
         }
         transfer.setUserFrom(userFrom);
         String stringAmount = UserOutput.promptForString("How much money would you like to request? ");
-        BigDecimal amount;
-        try {
-            amount = new BigDecimal(stringAmount);
-        } catch (Exception e) {
-            UserOutput.printRed("Invalid amount.");
-            return;
-        }
-        if (!Validation.amountIsPositive(stringAmount)) {
-            UserOutput.printRed(TRANSFER_IS_NOT_POSITIVE_MESSAGE);
-            return;
-        }
-        if (Validation.exceedsTransferLimit(amount)) {
-            UserOutput.printRed(TRANSFER_EXCEEDS_LIMIT_MESSAGE);
+        BigDecimal amount = Validation.validTransferAmountOrNull(stringAmount);
+        if (amount == null) {
             return;
         }
         transfer.setAmount(amount);
@@ -191,15 +178,8 @@ public class TransferService {
         }
         transfer.setUserTo(userTo);
         String stringAmount = UserOutput.promptForString("How much money would you like to send? ");
-        BigDecimal amount;
-        try {
-            amount = new BigDecimal(stringAmount);
-        } catch (Exception e) {
-            UserOutput.printRed("Invalid amount.");
-            return;
-        }
-        if (!Validation.amountIsPositive(stringAmount)) {
-            UserOutput.printRed(TRANSFER_IS_NOT_POSITIVE_MESSAGE);
+        BigDecimal amount = Validation.validTransferAmountOrNull(stringAmount);
+        if (amount == null) {
             return;
         }
         if (Validation.amountMoreThanBalance(accountService.getCurrentBalance(currentUser), amount)) {
@@ -207,10 +187,6 @@ public class TransferService {
             return;
         }
         transfer.setAmount(amount);
-        if (Validation.exceedsTransferLimit(amount)) {
-            UserOutput.printRed(TRANSFER_EXCEEDS_LIMIT_MESSAGE);
-            return;
-        }
         try {
             HttpEntity<Transfer> entity = EntityService.constructTransferEntity(currentUser, transfer);
             restTemplate.exchange(TRANSFER_BASE_URL, HttpMethod.POST, entity, Void.class);
@@ -247,13 +223,14 @@ public class TransferService {
             case 1:
                 UserOutput.printMessage(Icons.cuteDollarHandingBunny);
                 transferStatus = "Approved";
-                BigDecimal transferAmount = getSpecificTransfer(currentUser, transferId).getAmount();
+                BigDecimal transferAmount = getTransfer(currentUser, transferId).getAmount();
                 if (Validation.amountMoreThanBalance(accountService.getCurrentBalance(currentUser),
                         transferAmount)) {
                     UserOutput.printRed(INSUFFICIENT_FUNDS_MESSAGE);
                     return;
                 }
                 if (Validation.exceedsTransferLimit(transferAmount)) {
+                    String TRANSFER_EXCEEDS_LIMIT_MESSAGE = "Transfers cannot exceed $99,999.99.";
                     UserOutput.printRed(TRANSFER_EXCEEDS_LIMIT_MESSAGE);
                     return;
                 }
