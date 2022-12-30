@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import java.math.BigDecimal;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 public class JdbcTransferDaoTest extends BaseDaoTests {
@@ -166,6 +167,8 @@ public class JdbcTransferDaoTest extends BaseDaoTests {
         // act
         List<Transfer> actual1 = sut.getPendingTransfersSentToUser(username1);
         List<Transfer> actual2 = sut.getPendingTransfersSentToUser(username2);
+        actual1.sort(new TransferComparator());
+        actual2.sort(new TransferComparator());
 
         // assert
         Assert.assertEquals("Because the expected list (1) and the actual list (1) must be of the same size.",
@@ -320,6 +323,10 @@ public class JdbcTransferDaoTest extends BaseDaoTests {
                 "transfer should be extracted from their account.", expectedBalanceUserFrom, finalBalanceUserFrom);
         Assert.assertEquals("Because if a user's request is approved, the amount of the transfer should be " +
                 "added to their account.", expectedBalanceUserTo, finalBalanceUserTo);
+
+        // cleanup
+        sut.updateTransferStatus(userFrom, transferId, "Pending");
+        sut.createTransfer(new Transfer("Send", TRANSFER_1.getUserTo(), userFrom, TRANSFER_1.getAmount()));
     }
 
     @Test
@@ -347,42 +354,6 @@ public class JdbcTransferDaoTest extends BaseDaoTests {
             "have a change in the amount in their account.", initialBalanceUserTo, finalBalanceUserTo);
     }
 
-    @Test
-    public void sendTransfer_returnsTrue_givenValidTransfer() {
-        // arrange
-
-
-        // act
-
-
-        // assert
-
-    }
-
-    @Test
-    public void isValidTransfer_returnsFalse_givenTransfer_transferAmountMoreThanBalance() {
-        // arrange
-
-
-        // act
-
-
-        // assert
-
-    }
-
-    @Test
-    public void getAccountIdByUsername() {
-        // arrange
-
-
-        // act
-
-
-        // assert
-
-    }
-
     @After
     public void rollback() throws SQLException {
         dataSource.getConnection().rollback();
@@ -396,5 +367,12 @@ public class JdbcTransferDaoTest extends BaseDaoTests {
         Assert.assertEquals(messageBase + "'from' user.", transfer1.getUserFrom(), transfer2.getUserFrom());
         Assert.assertEquals(messageBase + "'to' user.", transfer1.getUserTo(), transfer2.getUserTo());
         Assert.assertEquals(messageBase + "amount.", transfer1.getAmount(), transfer2.getAmount());
+    }
+
+    private static class TransferComparator implements Comparator<Transfer> {
+        @Override
+        public int compare(Transfer a, Transfer b) {
+            return a.getTransferId() - b.getTransferId();
+        }
     }
 }

@@ -105,13 +105,13 @@ public class ValidationTest {
     @Test
     public void amountMoreThanBalance_ReturnsTrue_GivenAmount_MoreThanBalance() {
         //arrange
-        BigDecimal balance1 = new BigDecimal(400.00);
-        BigDecimal balance2 = new BigDecimal(0.01);
-        BigDecimal balance3 = new BigDecimal(1.00);
+        BigDecimal balance1 = new BigDecimal("400.00");
+        BigDecimal balance2 = new BigDecimal("0.01");
+        BigDecimal balance3 = new BigDecimal("1.00");
 
-        BigDecimal amount1 = new BigDecimal(500.00);
-        BigDecimal amount2 = new BigDecimal(0.02);
-        BigDecimal amount3 = new BigDecimal(1.50);
+        BigDecimal amount1 = new BigDecimal("500.00");
+        BigDecimal amount2 = new BigDecimal("0.02");
+        BigDecimal amount3 = new BigDecimal("1.50");
 
         //act
         boolean actual1 = Validation.amountMoreThanBalance(balance1, amount1);
@@ -130,13 +130,13 @@ public class ValidationTest {
     @Test
     public void amountMoreThanBalance_ReturnsFalse_GivenAmount_LessThanOrEqualToBalance() {
         //arrange
-        BigDecimal balance1 = new BigDecimal(400.00);
-        BigDecimal balance2 = new BigDecimal(0.01);
-        BigDecimal balance3 = new BigDecimal(1.00);
+        BigDecimal balance1 = new BigDecimal("400.00");
+        BigDecimal balance2 = new BigDecimal("0.01");
+        BigDecimal balance3 = new BigDecimal("1.00");
 
-        BigDecimal amount1 = new BigDecimal(399.99);
-        BigDecimal amount2 = new BigDecimal(0.01);
-        BigDecimal amount3 = new BigDecimal(0.50);
+        BigDecimal amount1 = new BigDecimal("399.99");
+        BigDecimal amount2 = new BigDecimal("0.01");
+        BigDecimal amount3 = new BigDecimal("0.50");
 
         //act
         boolean actual1 = Validation.amountMoreThanBalance(balance1, amount1);
@@ -252,7 +252,7 @@ public class ValidationTest {
         Transfer transfer1 = new Transfer();
         transfer1.setTransferId(1001);
         Transfer transfer2 = new Transfer();
-        transfer2.setTransferId(002);
+        transfer2.setTransferId(2);
         Transfer transfer3 = new Transfer();
         transfer3.setTransferId(3);
         List<Transfer> transfers = new ArrayList<>();
@@ -284,7 +284,7 @@ public class ValidationTest {
         Transfer transfer1 = new Transfer();
         transfer1.setTransferId(1001);
         Transfer transfer2 = new Transfer();
-        transfer2.setTransferId(002);
+        transfer2.setTransferId(2);
         Transfer transfer3 = new Transfer();
         transfer3.setTransferId(3);
         List<Transfer> transfers = new ArrayList<>();
@@ -294,7 +294,7 @@ public class ValidationTest {
 
         int transferId1 = 1001;
         int transferId2 = 2;
-        int transferId3 = 003;
+        int transferId3 = 3;
 
         //act
         boolean actual1 = Validation.isInvalidTransferId(transfers, transferId1);
@@ -349,7 +349,6 @@ public class ValidationTest {
         Object actual3 = Validation.validTransferAmountOrNull(amount3);
         Object actual4 = Validation.validTransferAmountOrNull(amount4);
 
-
         //assert
         String message1 = "Because amount (-4000) is not valid (not greater than zero)";
         assertNull(message1, actual1);
@@ -360,5 +359,4 @@ public class ValidationTest {
         String message4 = "Because amount (hello) is not valid (not a number - cannot convert into BigDecimal)";
         assertNull(message4, actual4);
     }
-
 }

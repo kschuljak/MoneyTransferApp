@@ -4,7 +4,6 @@ import com.techelevator.tenmo.model.Transfer;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.stereotype.Component;
-
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -150,7 +149,7 @@ public class JdbcTransferDao implements TransferDao {
 
     @Override
     public void updateTransferStatus(String username, int transferId, String newTransferStatus) {
-        if (newTransferStatus.equals("Rejected")) {
+        if (newTransferStatus.equals("Rejected") || newTransferStatus.equals("Pending")) {
             String sqlQuery = "UPDATE transfer\n" +
                     "SET transfer_status_id = (SELECT transfer_status_id FROM transfer_status WHERE " +
                     "transfer_status_desc = ?)\n" +
@@ -197,7 +196,11 @@ public class JdbcTransferDao implements TransferDao {
             "\t(SELECT account_id FROM account JOIN tenmo_user ON account.user_id = tenmo_user.user_id WHERE " +
                 "username = ?);" +
             "COMMIT;";
-        jdbcTemplate.update(sqlQuery, amount, userTo, amount, userFrom, transferId, userFrom);
+        try {
+            jdbcTemplate.update(sqlQuery, amount, userTo, amount, userFrom, transferId, userFrom);
+        } catch (Exception e) {
+            return false;
+        }
         return true;
     }
 
