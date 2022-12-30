@@ -3,15 +3,12 @@ package com.techelevator.tenmo.views;
 import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
-import com.techelevator.tenmo.models.UserCredentials;
 import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.Scanner;
 
 public class UserOutput {
-    private static final Scanner scanner = new Scanner(System.in);
-    public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###,###.00");
+    public static final DecimalFormat DECIMAL_FORMAT = new DecimalFormat("#,###,##0.00");
 
     public static void printGreeting() {
         System.out.println("*********************");
@@ -38,36 +35,6 @@ public class UserOutput {
         System.out.println("0: Exit");
     }
 
-    public static int promptForMenuSelection(String prompt) {
-        System.out.println();
-        int menuSelection;
-        System.out.print(prompt);
-        try {
-            menuSelection = Integer.parseInt(scanner.nextLine());
-        } catch (NumberFormatException e) {
-            menuSelection = -1;
-        }
-        return menuSelection;
-    }
-
-    public static UserCredentials promptForCredentials() {
-        System.out.println();
-        String username = promptForString("Username: ");
-        String password = promptForString("Password: ");
-        return new UserCredentials(username, password);
-    }
-
-    public static String promptForString(String prompt) {
-        System.out.print(prompt);
-        return scanner.nextLine();
-    }
-
-    public static void pause() {
-        System.out.println();
-        System.out.print("Press Enter to continue...");
-        scanner.nextLine();
-    }
-
     public static void printErrorMessage() {
         System.out.println();
         printRed("An error occurred. Check the log for details.");
@@ -76,6 +43,10 @@ public class UserOutput {
     public static void printMessage(String message) {
         System.out.println();
         System.out.println(message);
+    }
+
+    public static void printInlineMessage(String message) {
+        System.out.print(message);
     }
 
     public static void printSpace() {

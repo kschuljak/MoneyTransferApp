@@ -4,19 +4,18 @@ import com.techelevator.tenmo.models.AuthenticatedUser;
 import com.techelevator.tenmo.models.Transfer;
 import com.techelevator.tenmo.models.User;
 import com.techelevator.tenmo.views.UserOutput;
-
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 
 public class Validation {
-
-    private static final String TRANSFER_EXCEEDS_LIMIT_MESSAGE = "Transfers cannot exceed $99,999.99.";
-    private final String INVALID_USERNAME_MESSAGE = "Invalid user.";
-    private final String INVALID_TRANSFER_MESSAGE = "Invalid transfer.";
+    public static final BigDecimal TRANSFER_LIMIT = new BigDecimal("99999.99");
+    private static final String TRANSFER_EXCEEDS_LIMIT_MESSAGE = "Transfers cannot exceed $" +
+            UserOutput.DECIMAL_FORMAT.format(TRANSFER_LIMIT) + ".";
     private static final String INVALID_AMOUNT_MESSAGE = "Invalid amount.";
     private static final String TRANSFER_IS_NOT_POSITIVE_MESSAGE = "You cannot send or request a non-positive amount of money.";
-
-    public static final BigDecimal TRANSFER_LIMIT = new BigDecimal("99999.99");
+    private static final String CANT_SEND_MONEY_TO_SELF_MESSAGE = "You cannot send money to yourself.";
+    private static final String INVALID_USERNAME_MESSAGE = "Invalid user.";
 
     public Validation() {
     }
@@ -59,7 +58,7 @@ public class Validation {
     public static BigDecimal validTransferAmountOrNull(String stringAmount) {
         BigDecimal amount;
         try {
-            amount = new BigDecimal(stringAmount);
+            amount = new BigDecimal(stringAmount).setScale(2, RoundingMode.FLOOR);
         } catch (Exception e) {
             UserOutput.printRed(INVALID_AMOUNT_MESSAGE);
             return null;
@@ -73,5 +72,17 @@ public class Validation {
             return null;
         }
         return amount;
+    }
+
+    public static boolean isInvalidRecipient(List<User> allUsers, String username, AuthenticatedUser currentUser) {
+        if (username.equals(currentUser.getUser().getUsername())) {
+            UserOutput.printRed(CANT_SEND_MONEY_TO_SELF_MESSAGE);
+            return true;
+        }
+        if (Validation.isInvalidUser(allUsers, username)) {
+            UserOutput.printRed(INVALID_USERNAME_MESSAGE);
+            return true;
+        }
+        return false;
     }
 }

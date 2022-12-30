@@ -5,6 +5,7 @@ import com.techelevator.tenmo.models.UserCredentials;
 import com.techelevator.tenmo.services.AccountService;
 import com.techelevator.tenmo.services.AuthenticationService;
 import com.techelevator.tenmo.services.TransferService;
+import com.techelevator.tenmo.views.UserInput;
 import com.techelevator.tenmo.views.UserOutput;
 
 public class TenmoApp {
@@ -26,42 +27,42 @@ public class TenmoApp {
     private void loginMenu() {
         int menuSelection = -1;
         while (menuSelection != 0 && currentUser == null) {
-            userOutput.printLoginMenu();
-            menuSelection = userOutput.promptForMenuSelection("Please choose an option: ");
+            UserOutput.printLoginMenu();
+            menuSelection = UserInput.promptForMenuSelection("Please choose an option: ");
             if (menuSelection == 1) {
                 handleRegister();
             } else if (menuSelection == 2) {
                 handleLogin();
             } else if (menuSelection != 0) {
-                userOutput.printRed("Invalid selection.");
-                userOutput.pause();
+                UserOutput.printRed("Invalid selection.");
+                UserInput.pause();
             }
         }
     }
 
     private void handleRegister() {
-        userOutput.printMessage("Please register a new user account.");
-        UserCredentials credentials = userOutput.promptForCredentials();
+        UserOutput.printMessage("Please register a new user account.");
+        UserCredentials credentials = UserInput.promptForCredentials();
         if (authenticationService.register(credentials)) {
-            userOutput.printMessage("Registration successful. You can now login.");
+            UserOutput.printMessage("Registration successful. You can now login.");
         } else {
-            userOutput.printErrorMessage();
+            UserOutput.printErrorMessage();
         }
     }
 
     private void handleLogin() {
-        UserCredentials credentials = userOutput.promptForCredentials();
+        UserCredentials credentials = UserInput.promptForCredentials();
         currentUser = authenticationService.login(credentials);
         if (currentUser == null) {
-            userOutput.printErrorMessage();
+            UserOutput.printErrorMessage();
         }
     }
 
     private void mainMenu() {
         int menuSelection = -1;
         while (menuSelection != 0) {
-            userOutput.printMainMenu();
-            menuSelection = userOutput.promptForMenuSelection("Please choose an option: ");
+            UserOutput.printMainMenu();
+            menuSelection = UserInput.promptForMenuSelection("Please choose an option: ");
             if (menuSelection == 1) {
                 accountService.viewCurrentBalance(currentUser);
             } else if (menuSelection == 2) {
@@ -79,9 +80,9 @@ public class TenmoApp {
             } else if (menuSelection == 0) {
                 continue;
             } else {
-                userOutput.printRed("Invalid selection.");
+                UserOutput.printRed("Invalid selection.");
             }
-            userOutput.pause();
+            UserInput.pause();
         }
     }
 }
