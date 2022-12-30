@@ -11,13 +11,12 @@ import java.math.BigDecimal;
 
 public class AccountService {
     protected final RestTemplate restTemplate = new RestTemplate();
-    private final UserOutput out = new UserOutput();
 
     public AccountService() { }
 
     public void viewCurrentBalance(AuthenticatedUser currentUser) {
         BigDecimal balance = getCurrentBalance(currentUser);
-        out.printBalance(balance);
+        UserOutput.printBalance(balance);
     }
 
     public BigDecimal getCurrentBalance(AuthenticatedUser currentUser) {

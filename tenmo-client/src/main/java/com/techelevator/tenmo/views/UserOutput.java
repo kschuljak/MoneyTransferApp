@@ -66,12 +66,13 @@ public class UserOutput {
 
     public static void printUsers(List<User> allUsers, AuthenticatedUser currentUser) {
         System.out.println();
-        System.out.println(Colors.CYAN_FONT + "***Users***" + Colors.RESET);
+        System.out.println(Colors.CYAN_FONT + "***** Users *****" + Colors.RESET);
         for (User user : allUsers) {
             if (!user.getUsername().equals(currentUser.getUser().getUsername())) {
                 System.out.println(user.getUsername());
             }
         }
+        System.out.println(Colors.CYAN_FONT + "*****************" + Colors.RESET);
     }
 
     public static void printTransfer(Transfer transfer) {
@@ -97,21 +98,22 @@ public class UserOutput {
         }
 
         System.out.println();
-        System.out.println(Colors.CYAN_FONT + "***Transfers***" + Colors.RESET);
+        System.out.println(Colors.CYAN_FONT + "*** Transfers ***" + Colors.RESET);
 
         for (Transfer transfer : transfers) {
             printFormattedTransfer(transfer, longestType, longestStatus, longestAmount, longestFrom, longestTo);
         }
+        System.out.println(Colors.CYAN_FONT + "*****************" + Colors.RESET);
     }
 
     public static void printFormattedTransfer(Transfer transfer, int longestType, int longestStatus, int longestAmount,
                                               int longestFrom, int longestTo) {
-        String formatId = "Transfer " + String.format("%-4s", transfer.getTransferId()) + " | ";
+        String formatId = "Transfer " + String.format("%-4s", transfer.getTransferId());
         String formatType = String.format("%-" + longestType + "s", transfer.getTransferType());
         String formatStatus = String.format("%-" + longestStatus + "s", transfer.getTransferStatus());
         String formatAmount = "$" + String.format("%-" + longestAmount + "s",
-                DECIMAL_FORMAT.format(transfer.getAmount())) + " | ";
-        String formatUserFrom = "From: " + String.format("%-" + longestFrom + "s", transfer.getUserFrom()) + " | ";
+                DECIMAL_FORMAT.format(transfer.getAmount()));
+        String formatUserFrom = "From: " + String.format("%-" + longestFrom + "s", transfer.getUserFrom());
         String formatUserTo = "To: " + String.format("%-" + longestTo + "s", transfer.getUserTo());
 
         switch (transfer.getTransferStatus()) {
@@ -135,6 +137,7 @@ public class UserOutput {
                 break;
         }
 
-        System.out.println(formatId + formatType + " | " + formatStatus + " | " + formatAmount + formatUserFrom + formatUserTo);
+        System.out.println(formatId + " | " + formatType + " | " + formatStatus + " | " + formatAmount + " | " +
+                formatUserFrom + " | " + formatUserTo);
     }
 }
