@@ -25,6 +25,15 @@ public class Transfer {
         }
     }
 
+    public Transfer(int transferId, String transferType, String transferStatus, String userFrom, String userTo, BigDecimal amount) {
+        this.transferId = transferId;
+        this.transferType = transferType;
+        this.transferStatus = transferStatus;
+        this.userFrom = userFrom;
+        this.userTo = userTo;
+        this.amount = amount;
+    }
+
     public Transfer() {
     }
 
