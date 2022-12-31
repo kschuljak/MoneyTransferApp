@@ -68,7 +68,7 @@ public class TenmoApp {
             } else if (menuSelection == 2) {
                 transferService.viewTransfers(currentUser);
             } else if (menuSelection == 3) {
-                transferService.viewPendingRequests(currentUser);
+                transferService.viewAllPendingRequests(currentUser);
             } else if (menuSelection == 4) {
                 transferService.viewTransfer(currentUser);
             } else if (menuSelection == 5) {

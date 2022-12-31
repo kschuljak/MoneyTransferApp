@@ -44,29 +44,27 @@ public class TransferService {
         if (transfers.size() == 0) {
             UserOutput.printMessage("You have no past transfers.");
         } else {
-            UserOutput.printTransfers(transfers);
+            UserOutput.printTransfers(transfers, currentUser, true, true);
         }
     }
 
-    public void viewPendingRequests(AuthenticatedUser currentUser) {
-        int pendingRequestsChoice = UserInput.promptForMenuSelection("Would you like to:\n1: View all pending " +
-                "requests\n2: View received and pending requests\n3: View sent and pending requests\n\nPlease choose " +
-                "an option: ");
+    public void viewAllPendingRequests(AuthenticatedUser currentUser) {
         String url = TRANSFER_BASE_URL + "?status=pending";
-        switch (pendingRequestsChoice) {
-            case 1:
-                break;
-            case 2:
-                url += "&sentto=user";
-                break;
-            case 3:
-                url += "&sentby=user";
-                break;
-        }
-        viewPendingRequests(currentUser, url);
+        boolean printDeposit = true;
+        boolean printWithdrawal = true;
+        viewPendingRequests(currentUser, url, printDeposit, printWithdrawal);
+
     }
 
-    public List<Transfer> viewPendingRequests(AuthenticatedUser currentUser, String url) {
+    public List<Transfer> viewPendingRequestsForApproval(AuthenticatedUser currentUser) {
+        String url = TRANSFER_BASE_URL + "?status=pending&sentto=user";
+        boolean printDeposit = false;
+        boolean printWithdrawal = true;
+        List<Transfer> transfers = viewPendingRequests(currentUser, url, printDeposit, printWithdrawal);
+        return transfers;
+    }
+
+    public List<Transfer> viewPendingRequests(AuthenticatedUser currentUser, String url, boolean printDeposit, boolean printWithdrawal) {
         List<Transfer> transfers = new ArrayList<>();
         try {
             HttpEntity<Void> entity = EntityService.constructBlankEntity(currentUser);
@@ -80,7 +78,7 @@ public class TransferService {
         if (transfers.size() == 0) {
             UserOutput.printMessage("You have no pending requests of this type.");
         } else {
-            UserOutput.printTransfers(transfers);
+            UserOutput.printTransfers(transfers, currentUser, printDeposit, printWithdrawal);
         }
         return transfers;
     }
@@ -91,7 +89,7 @@ public class TransferService {
         if (transfer == null) {
             UserOutput.printRed(INVALID_TRANSFER_MESSAGE);
         } else {
-            UserOutput.printTransfer(transfer);
+            UserOutput.printTransferDetails(transfer, currentUser);
         }
     }
 
@@ -199,7 +197,7 @@ public class TransferService {
         Likewise, if the user inputs something invalid when prompted to approve or reject the transfer, they are
         informed that they made an invalid choice and returned to the home screen.
         */
-        List<Transfer> transfers = viewPendingRequests(currentUser, TenmoApp.API_BASE_URL + "transfers?status=pending&sentto=user");
+        List<Transfer> transfers = viewPendingRequestsForApproval(currentUser);
         Transfer transfer = new Transfer();
         int transferId = UserInput.promptForMenuSelection("Which transfer would you like to update? ");
         if (Validation.isInvalidTransferId(transfers, transferId)) {
