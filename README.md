@@ -13,7 +13,7 @@
 ### If users choose to request money, they are given a list of usernames they can request money from.   
 ![image](https://user-images.githubusercontent.com/47723396/210193221-5338dbf1-f81d-4e5f-a0e5-d4390b9a419d.png)   
 
-### To request money, users must enter both a username and the amount that they are requesting.   
+### To request money from another user, users must enter both a username and the amount that they are requesting.   
 ![image](https://user-images.githubusercontent.com/47723396/210193264-b5a1954b-7c74-4330-bf3c-d97b229f3704.png)   
 
 ### When requesting money, the other user must apprive the request before the transaction is processed.   
