@@ -17,7 +17,7 @@
 ![image](https://user-images.githubusercontent.com/47723396/210193264-b5a1954b-7c74-4330-bf3c-d97b229f3704.png)   
 
 ### When requesting money, the other user must approve the request before the transaction is processed.   
-### Users may also send money to another user.  Unlike requests, when sending money the tranasaction is automatically approved and processed.   
+### Users may also send money to another user.  Unlike requests, when sending money the transaction is automatically approved and processed.   
 ![image](https://user-images.githubusercontent.com/47723396/210193309-054f1d6f-d075-48bf-843f-e9642a3d0617.png)   
 
 ### When viewing past transfers, transactions are sorted into Deposits and Withdrawals, and the display is color-coded.   
