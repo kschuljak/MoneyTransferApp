@@ -18,7 +18,9 @@ When viewing past transfers, transactions are sorted into Deposits and Withdrawa
 ![image](https://user-images.githubusercontent.com/47723396/210193410-e294cd04-737f-4ac9-a581-6e3381f61fa0.png)   
 Users may view the details of a specific transfer using the transfer number.   
 ![image](https://user-images.githubusercontent.com/47723396/210193439-f93df1ef-67ff-4e63-9174-60e870c637f0.png)   
---- (logging in as bob) ---
+---  
+(logging in as bob)   
+---
 Another display of past transfers, color-coded and sorted into Deposits and Withdrawals.   
 ![image](https://user-images.githubusercontent.com/47723396/210193493-793d09d6-bc6f-495c-86ea-6f4b67b81c89.png)   
 When users choose to view pending requests, the transfer list only displays transfers that are still pending.   
