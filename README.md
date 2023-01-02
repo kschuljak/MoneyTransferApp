@@ -39,6 +39,7 @@
 
 ### Users may enter a transfer number to update that specific pending transfer.   
 ![image](https://user-images.githubusercontent.com/47723396/210193670-ab95ef0d-b856-4d11-b518-aee57f76ec17.png)   
+### A message is displayed based on whether the user approves or rejects the transfer.   
 ![image](https://user-images.githubusercontent.com/47723396/210193689-476efc5e-a7c5-4c7c-a9f5-893f9c8b0077.png)   
 
 ### When viewing past transfers again, the display is updated to reflect approved/rejected transfers.   
