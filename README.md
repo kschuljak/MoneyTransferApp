@@ -47,3 +47,25 @@ When viewing past transfers again, the display is updated to reflect approved/re
 Viewing the current balance also reflects the updated account balance after approving a transfer.   
 ![image](https://user-images.githubusercontent.com/47723396/210193756-eefe6c5b-12eb-411e-aa70-e69bb4e57732.png)  
 
+--- Errors ---
+
+When a user enters an invalid transfer number when trying to view a specific transfer, an error message is displayed.   
+![image](https://user-images.githubusercontent.com/47723396/210194055-15a9f513-4f79-4da3-b561-7b4366eed029.png)   
+
+If a user enters an invalid username to send money to (or request money from), an error message is displayed.   
+![image](https://user-images.githubusercontent.com/47723396/210194098-c29f36f7-3841-4b10-91d0-bf1f345131ab.png)   
+   
+If a user tries to send an amount greater than their current account balance, an error message is displayed.   
+![image](https://user-images.githubusercontent.com/47723396/210194116-3698446a-7bbe-4472-af37-18b9b2a3b1ab.png)   
+
+If a user tries to request an amount greater than the transfer limit of $99,999.99, an error message is displayed.   
+![image](https://user-images.githubusercontent.com/47723396/210194194-4a16b89a-1376-49bb-af33-aecea31fbf1a.png)   
+
+If a user enters an invalid option from the main menu, an error message is displayed.   
+![image](https://user-images.githubusercontent.com/47723396/210194232-9eac31ee-175a-45e6-969b-9671b9fa1a84.png)
+
+
+
+
+
+
