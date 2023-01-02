@@ -7,7 +7,7 @@
 ### Once registered, users can log-in.  For our purposes, users start with a balance of 1,000 'TE bucks'/ $1,000.00.   
 ![image](https://user-images.githubusercontent.com/47723396/210193172-8b1c1db4-1352-4c34-b5e5-fd9859754c53.png)   
 
-### A message is displayed if users try to view past transactions without having a transaction history.   
+### A message is displayed if users try to view past transfers without having a transaction history.   
 ![image](https://user-images.githubusercontent.com/47723396/210193184-bfe65e53-d149-4897-8f63-7d0884aaeaf7.png)   
 
 ### If users choose to request money, they are given a list of usernames they can request money from.   
