@@ -4,7 +4,7 @@
 Users must register to create an account.   
 ![image](https://user-images.githubusercontent.com/47723396/210193133-75b98a34-221d-4de3-813d-66a9f1407c70.png)   
 
-Once registered, users can log-in.  For our purposes, users start with a balance of 1,000 'TE bucks'.   
+Once registered, users can log-in.  For our purposes, users start with a balance of 1,000 'TE bucks' ($1,000.00).   
 ![image](https://user-images.githubusercontent.com/47723396/210193172-8b1c1db4-1352-4c34-b5e5-fd9859754c53.png)   
 
 If users try to view past transactions without having made any yet, a message is displayed.   
